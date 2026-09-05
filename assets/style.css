@@ -1,0 +1,986 @@
+@charset "utf-8";
+/* ============================================================
+   はじめての特殊清掃 ── スタイル
+   マスター設計書 §3（ブランド仕様）と §8-2（遺族トーン）の実装。
+
+   守っていること
+   - 色は墨藍・和紙・灰茶の3色で組み、灯（#D9A05B）はCTAの中だけに閉じ込める
+   - 高彩度の赤・橙・桃、黒ベタ、点滅は使わない
+   - 欧文の見出し書体を一切使わない。数字も本文書体のまま少しだけ大きくする
+   - 動きは「静かに現れる」だけ。視差も追従カーソルも使わない
+   ============================================================ */
+
+/* 書体は自前で配信する。外部CDNを使わないのは、
+   家族を亡くした直後の方が開くページから、第三者へ通信を出さないため。
+   ファイルは tools/subset-fonts.py が実際に使う文字だけに絞って書き出す。 */
+@font-face{font-family:"Zen Old Mincho";font-style:normal;font-weight:600;font-display:swap;
+  src:url("/assets/fonts/zen-old-mincho-japanese-600-normal.woff2") format("woff2")}
+@font-face{font-family:"BIZ UDPGothic";font-style:normal;font-weight:400;font-display:swap;
+  src:url("/assets/fonts/biz-udpgothic-japanese-400-normal.woff2") format("woff2")}
+@font-face{font-family:"BIZ UDPGothic";font-style:normal;font-weight:700;font-display:swap;
+  src:url("/assets/fonts/biz-udpgothic-japanese-700-normal.woff2") format("woff2")}
+
+:root{
+  /* 2026-08-17：地色を白に、文字を一段濃くした。
+     和紙色の全面ベタは画面上で「灰色く沈んだ」印象になり、本文の可読性も落ちるため、
+     地は白（--washi）＝#FFF に。和紙の色味は帯・表の見出し・図解の面（--washi-2/3）に残す。 */
+  --sumi:#1A3A45;        /* 墨藍（本文。旧#22434Eより濃く） */
+  --sumi-deep:#102A33;   /* 墨藍を沈めた見出し用 */
+  --sumi-soft:#3D5C67;
+  --washi:#FFFFFF;       /* 地色（白） */
+  --washi-2:#F6F3EC;     /* 和紙の陰（帯・表頭・図解の面） */
+  --washi-3:#EDE7DA;
+  /* 主要色はロゴ（2026-08-17制定）から採色。青×ティール＝清潔・信頼。
+     金・王冠・朱は廃止。#006CC3は白文字5.34、#B45708は白地4.88でAA合格を機械確認済み。 */
+  --ao:#006CC3;          /* ロゴの青（CTA・リンク・1位） */
+  --ao-deep:#00559C;     /* hover・本文リンク */
+  --ao-pale:#EAF3FB;     /* 青の淡い面 */
+  --mizu:#01AEB9;        /* ロゴのティール（装飾のみ。文字は乗せない） */
+  --mizu-pale:#E6F7F8;
+  --dai:#E8801F;         /* 橙（見出しの罫・★。文字は乗せない） */
+  --dai-deep:#B45708;    /* 橙の文字用 */
+  --cream:#FDF3E7;       /* 見出し帯の面 */
+  --gin:#6E7276;         /* 銀（2位） */
+  --dou:#8A6A4F;         /* 銅（3位） */
+  --sora-pale:#EEF4F7;   /* 淡青の面（清潔感） */
+  --haicha:#514A41;      /* 灰茶（補助文字。旧#6B6257より濃く） */
+  --rule:rgba(81,74,65,.26);
+  --rule-soft:rgba(81,74,65,.15);
+  --paper-shadow:0 1px 0 rgba(107,98,87,.10), 0 8px 24px -18px rgba(34,67,78,.5);
+
+  --sans:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",system-ui,sans-serif;
+  --serif:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+
+  --measure:34em;
+  --gut:clamp(1.15rem,4.5vw,2rem);
+  --band:clamp(3.5rem,8vw,6.5rem);   /* 節と節のあいだ */
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  background:var(--washi);
+  color:var(--sumi);
+  font-family:var(--sans);
+  font-size:clamp(15.5px,1.02vw + 13.4px,17.5px);
+  line-height:2.0;
+  letter-spacing:.02em;
+  font-feature-settings:"palt" 1;
+  padding-bottom:5.2rem;                /* 追従バーの分 */
+  text-underline-offset:.22em;
+}
+
+/* 数字だけ本文比118%（§3：115〜125%） */
+.num,.ledger__score b,.stat__n{font-size:1.32em;font-weight:700;letter-spacing:.01em;font-feature-settings:"palt" 0;}
+
+h1,h2,h3,h4{font-family:var(--sans);font-weight:700;line-height:1.5;letter-spacing:.03em;color:var(--sumi-deep);margin:0}
+a{color:var(--sumi);text-decoration-thickness:1px}
+a:hover{color:var(--sumi-soft)}
+:focus-visible{outline:2px solid var(--sumi);outline-offset:3px;border-radius:2px}
+img{max-width:100%;height:auto}
+p{margin:0 0 1.35em}
+ul,ol{margin:0 0 1.35em;padding-left:1.35em}
+li{margin:.35em 0}
+
+.u-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-9999px;top:0;background:var(--sumi);color:var(--washi);padding:.7em 1.2em;z-index:100}
+.skip:focus{left:0}
+
+/* ── 版面 ───────────────────────────────────────── */
+.wrap{max-width:74rem;margin-inline:auto;padding-inline:var(--gut)}
+/* 記事本文の段。実在のランキングサイトは1カラム700〜800px幅が標準。
+   冒頭とヘッダーだけ広く取り、本文はこちらに寄せる。 */
+.wrap-a{max-width:56rem;margin-inline:auto;padding-inline:var(--gut)}
+.read{max-width:var(--measure)}
+.wrap-a .read{max-width:none}
+.wrap-a .sec__lead{max-width:none}
+.sec{padding-block:var(--band)}
+.sec + .sec{padding-top:0}
+/* 節見出し。本文とのジャンプ率を上げた（旧1.35〜1.85rem→1.6〜2.45rem）。
+   マーカーは朱の縦罫に変え、節の始まりが遠目にも分かるようにする。 */
+.sec__h{font-size:clamp(1.34rem,2.7vw,1.8rem);font-weight:800;line-height:1.6;margin-bottom:1.1em;background:var(--cream);border-left:5px solid var(--dai);border-radius:0 4px 4px 0;padding:.6em .85em}
+.sec__lead{color:var(--haicha);margin-bottom:2.2em}
+
+/* ── 制作用の帯 ───────────────────────────────── */
+.draftbar{background:var(--sumi-deep);color:var(--washi);font-size:.8rem;line-height:1.7;padding:.55rem var(--gut);text-align:center;letter-spacing:.04em}
+
+/* ── ヘッダー ─────────────────────────────────── */
+.head{border-bottom:1px solid var(--rule);background:var(--washi);position:relative;z-index:20}
+.head__inner{max-width:74rem;margin-inline:auto;padding:1.05rem var(--gut);display:flex;align-items:center;justify-content:space-between;gap:1.4rem;flex-wrap:wrap}
+.head__brand{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.head__mark{display:block;flex:none}
+.head__names{display:flex;flex-direction:column;line-height:1.35}
+.head__name{font-family:var(--sans);font-weight:600;font-size:1.12rem;letter-spacing:.08em;color:var(--sumi-deep)}
+.head__tag{font-size:.7rem;color:var(--haicha);letter-spacing:.04em}
+.head__nav{display:none;font-size:.95rem}
+.head__nav a{text-decoration:none;color:var(--haicha);padding-bottom:.15em;border-bottom:1px solid transparent}
+.head__nav a:hover{color:var(--sumi);border-bottom-color:var(--rule)}
+
+/* ── メニューボタン（狭い画面）───────────────────────
+   768px未満では横並びのナビが折り返して2段になり、ロゴとの区別がつかなくなる。
+   details/summary だけで開閉するので JS を足さない（JSが落ちても開ける）。 */
+.head__menu{margin-left:auto}
+.head__menu-btn{display:inline-flex;align-items:center;gap:.45em;font-size:.82rem;font-weight:700;color:var(--sumi-deep);border:1px solid var(--rule);border-radius:5px;padding:.5em .8em;cursor:pointer;list-style:none;background:var(--washi-2);min-height:2.6em}
+.head__menu-btn::-webkit-details-marker{display:none}
+.head__menu-btn .bars{display:inline-flex;flex-direction:column;gap:3px}
+.head__menu-btn .bars i{display:block;width:15px;height:1.6px;background:var(--sumi-deep)}
+.head__menu[open] .head__menu-btn{background:var(--sumi-deep);color:#fff;border-color:var(--sumi-deep)}
+.head__menu[open] .head__menu-btn .bars i{background:#fff}
+@media (max-width:767px){
+  .head__nav{display:none}
+  .head__menu-btn{display:inline-flex}
+  .head__menu[open] .head__nav{display:flex;flex-direction:column;gap:0;position:absolute;left:0;right:0;top:100%;background:var(--washi);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);box-shadow:var(--paper-shadow);padding:.3rem var(--gut) .6rem;font-size:.95rem}
+  .head__menu[open] .head__nav a{padding:.95em 0;border-bottom:1px solid var(--rule-soft);color:var(--sumi)}
+  .head__menu[open] .head__nav a:last-child{border-bottom:0}
+}
+@media (max-width:640px){
+  .head__inner{padding-block:.85rem}
+  .head__tag{display:none}
+  .head__nav{width:100%;gap:1rem;font-size:.8rem;border-top:1px solid var(--rule-soft);padding-top:.7rem}
+}
+
+.crumbs{max-width:74rem;margin-inline:auto;padding:.85rem var(--gut) 0;font-size:.74rem;color:var(--haicha)}
+.crumbs ol{list-style:none;display:flex;flex-wrap:wrap;gap:.4em;margin:0;padding:0}
+.crumbs li+li::before{content:"／";margin-right:.4em;color:var(--rule)}
+.crumbs a{color:var(--haicha)}
+
+/* ── PR表記 ────────────────────────────────────
+   消費者庁の運用基準が禁じているのは「周囲より小さい／薄い／末尾に置く」の3つ。
+   本文と同じ字送り・同じ色で、H1直下に1行。枠で囲って目立たせる必要はない。 */
+.prline{font-size:.88rem;line-height:1.9;color:var(--sumi);margin:.2rem 0 0}
+
+/* 更新日と署名 */
+.byline{display:flex;flex-wrap:wrap;gap:.4em 1.2em;font-size:.78rem;color:var(--haicha);margin:1.1rem 0 .4rem;line-height:1.8}
+.byline__by::before,.byline__survey::before{content:"／";margin-right:1.2em;margin-left:-1.2em;color:var(--rule)}
+@media (max-width:520px){.byline__by::before,.byline__survey::before{display:none}}
+
+/* ── 冒頭 ─────────────────────────────────────── */
+.hero{padding-block:clamp(1.2rem,2.5vw,2rem) 0}
+/* 見出しを大きく、肩の小見出し（thin）は小さく。差を付けて視線の入口を作る。 */
+.hero__h{font-size:clamp(1.72rem,4.6vw,3.15rem);line-height:1.42;font-weight:600;letter-spacing:.02em}
+/* h1の肩バッジ。inline-blockだと見出し本文と同じ行に流れ込み、スマホで食い込む
+   （2026-08-18のユーザー指摘）。独立した行にして、文字も折り返せるようにする。 */
+.hero__h .thin{display:block;width:fit-content;max-width:100%;font-size:.4em;line-height:1.55;letter-spacing:.08em;color:var(--ao-deep);background:var(--ao-pale);border-radius:99px;padding:.5em 1.15em;margin:0 0 .85em;font-weight:700;font-family:var(--sans);white-space:normal}
+@media (max-width:520px){.hero__h .thin{font-size:.46em;padding:.45em 1em;margin-bottom:.7em;border-radius:14px}}
+/* リード文は本文より一段大きく（1.08em）。見出し→リード→本文の3段に落とす。 */
+.hero__lead{margin-top:1.8rem;max-width:var(--measure);font-size:1.08em;line-height:1.95}
+.hero__lead p{margin-bottom:.55em}
+.hero__lead p:last-child{margin-bottom:0}
+.hero__grid{display:grid;gap:clamp(2.2rem,4vw,3.4rem);margin-top:clamp(1.8rem,4vw,2.8rem);align-items:start}
+@media (min-width:980px){.hero__grid{grid-template-columns:minmax(0,1.15fr) minmax(20rem,.85fr)}}
+
+/* 配点パネル：このサイトの主張そのものを、最初の画面に置く */
+.weights{border:1px solid var(--rule);background:var(--washi-2);padding:1.35rem 1.4rem}
+.weights__h{font-family:var(--sans);font-size:.94rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .3em;line-height:1.6}
+.weights__sub{font-size:.74rem;color:var(--haicha);margin:0 0 1.1em;line-height:1.8}
+.weights__list{list-style:none;margin:0;padding:0}
+.weights__list li{display:grid;grid-template-columns:8.2em 1fr 2.6em;align-items:center;gap:.6em;margin:0;padding:.32em 0;font-size:.76rem;color:var(--sumi)}
+.weights__bar{height:7px;background:var(--washi-3);border:1px solid var(--rule-soft)}
+.weights__fill{display:block;height:100%;background:var(--sumi)}
+.weights__pt{text-align:right;color:var(--haicha);font-size:.92em}
+.weights__foot{font-size:.72rem;color:var(--haicha);margin:1.1em 0 0;padding-top:.9em;border-top:1px solid var(--rule);line-height:1.85}
+.weights__foot a{color:var(--sumi)}
+
+/* ── テーゼ ───────────────────────────────────── */
+.thesis{background:var(--sora-pale);border-block:1px solid var(--rule-soft);padding-block:var(--band)}
+.thesis__grid{display:grid;gap:1.6rem;margin-top:2rem}
+@media (min-width:820px){.thesis__grid{grid-template-columns:repeat(3,1fr);gap:1.9rem}}
+.thesis__item{border-top:2px solid var(--sumi);padding-top:1.05rem}
+.thesis__t{font-family:var(--sans);font-size:1.02rem;font-weight:600;margin-bottom:.6em;line-height:1.65}
+.thesis__b{font-size:.9rem;line-height:1.95;color:var(--haicha);margin:0}
+
+/* ── 会話 ─────────────────────────────────────── */
+.talk{max-width:var(--measure);margin-inline:auto}
+.talk__row{display:flex;gap:.85rem;margin-bottom:1.15rem;align-items:flex-start}
+.talk__who{flex:none;width:3.6em;font-size:.72rem;color:var(--haicha);padding-top:.5em;text-align:right;letter-spacing:.02em}
+.talk__say{background:var(--washi-2);border:1px solid var(--rule-soft);border-radius:2px 12px 12px 12px;padding:.85em 1.1em;font-size:.92rem;line-height:1.92;margin:0}
+.talk__row--me .talk__say{background:transparent;border-color:var(--rule);border-radius:12px 2px 12px 12px}
+
+/* ── 採点帯（署名要素）──────────────────────── */
+.ledger{margin:0}
+.ledger__bar{display:flex;height:15px;border:1px solid var(--sumi);background:var(--washi);overflow:hidden}
+.ledger--compact .ledger__bar{height:11px}
+.ledger__seg{display:block;position:relative;border-right:1px solid var(--washi)}
+.ledger__seg:last-child{border-right:0}
+.ledger__seg--earned{background:var(--sumi)}
+.ledger__seg--not{background:transparent}
+.ledger__seg--unknown{
+  background-image:repeating-linear-gradient(45deg,rgba(107,98,87,.42) 0 2px,transparent 2px 5px);
+  background-color:var(--washi-3)
+}
+.ledger__meta{display:flex;align-items:baseline;gap:.85em;margin-top:.5em;flex-wrap:wrap;font-size:.78rem;color:var(--haicha)}
+.ledger__score b{font-family:var(--sans);font-weight:600;color:var(--sumi-deep)}
+.ledger__of{color:var(--haicha);margin-left:.15em}
+.ledger__unknown{border:1px dashed var(--rule);padding:.1em .55em;letter-spacing:.02em}
+.ledger__done{color:var(--sumi)}
+
+.legend{list-style:none;padding:0;margin:1.1rem 0 0;display:flex;flex-wrap:wrap;gap:.5em 1.4em;font-size:.76rem;color:var(--haicha)}
+.legend li{display:flex;align-items:center;gap:.45em;margin:0}
+.legend__sw{width:1.5em;height:.72em;border:1px solid var(--sumi);flex:none}
+.legend__sw--earned{background:var(--sumi)}
+.legend__sw--unknown{background-color:var(--washi-3);background-image:repeating-linear-gradient(45deg,rgba(107,98,87,.42) 0 2px,transparent 2px 5px)}
+.legend__sw--not{background:transparent}
+
+/* ── 業者カード ───────────────────────────────── */
+.cards{display:grid;gap:1.15rem;margin-top:2rem}
+.card{background:var(--washi);border:1px solid var(--rule);box-shadow:var(--paper-shadow);padding:1.5rem clamp(1.1rem,3vw,1.9rem)}
+.card__head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.card__name{font-size:1.12rem;line-height:1.55;margin:0}
+.card__name a{text-decoration:none;border-bottom:1px solid var(--rule)}
+.card__where{font-size:.78rem;color:var(--haicha);margin:.4em 0 0}
+.card__verdict{font-size:.72rem;letter-spacing:.06em;border:1px solid var(--rule);padding:.25em .7em;color:var(--haicha);white-space:nowrap;background:var(--washi-2)}
+.card__verdict--listing{border-color:var(--sumi);color:var(--sumi)}
+.card__facts{list-style:none;padding:0;margin:1.1rem 0 0;display:grid;gap:.42rem;font-size:.84rem}
+.card__facts li{display:flex;gap:.6em;margin:0;line-height:1.8}
+.card__facts b{flex:none;width:8.6em;font-weight:400;color:var(--haicha);font-size:.94em}
+.card__missing{margin-top:1.05rem;font-size:.78rem;color:var(--haicha);border-top:1px dashed var(--rule);padding-top:.8rem;line-height:1.85}
+.card__missing b{font-weight:400;color:var(--sumi)}
+.card__actions{margin-top:1.2rem;display:flex;gap:.7rem;flex-wrap:wrap}
+.btn-line{display:inline-block;font-size:.82rem;text-decoration:none;border:1px solid var(--sumi);color:var(--sumi);padding:.55em 1.15em;background:transparent}
+.btn-line:hover{background:var(--sumi);color:var(--washi)}
+
+/* ── 比較表 ───────────────────────────────────── */
+.tablewrap{overflow-x:auto;margin-top:1.6rem;border:1px solid var(--rule);background:var(--washi)}
+.ctable{border-collapse:collapse;width:100%;min-width:44rem;font-size:.82rem}
+.ctable th,.ctable td{border-bottom:1px solid var(--rule-soft);padding:.75em .8em;text-align:left;vertical-align:middle}
+.ctable thead th{background:var(--washi-2);font-family:var(--sans);font-weight:600;font-size:.8rem;white-space:nowrap;border-bottom:1px solid var(--rule);position:sticky;top:0}
+.ctable tbody tr:last-child td{border-bottom:0}
+.ctable tbody th{min-width:7em;line-height:1.6;background:var(--washi-2);font-weight:400;color:var(--haicha);white-space:nowrap}
+.ctable tbody th a{word-break:auto-phrase}
+.ctable td{text-align:left}
+.ctable thead th{text-align:center}
+
+.ctable .mark{font-size:1rem;line-height:1}
+.ctable .mark--yes{color:var(--sumi)}
+.ctable .mark--no{color:var(--rule)}
+.ctable .mark--unknown{color:var(--haicha);font-size:.72rem;border:1px dashed var(--rule);padding:.05em .4em;white-space:nowrap}
+.tablenote{font-size:.76rem;color:var(--haicha);margin-top:.9rem;line-height:1.9}
+
+/* ── 配点表 ───────────────────────────────────── */
+.stable{border-collapse:collapse;width:100%;font-size:.86rem;margin-top:1.5rem}
+.stable th,.stable td{border-bottom:1px solid var(--rule-soft);padding:.85em .7em;text-align:left;vertical-align:top}
+.stable thead th{background:var(--washi-2);border-bottom:1px solid var(--rule);font-family:var(--sans);font-weight:600}
+.stable td:last-child,.stable th:last-child{text-align:right;white-space:nowrap}
+.stable tfoot td{font-family:var(--sans);font-weight:600;border-top:2px solid var(--sumi);border-bottom:0;background:var(--washi-2)}
+.stable__why{display:block;color:var(--haicha);font-size:.88em;line-height:1.85;margin-top:.35em}
+
+/* ── 注記 ─────────────────────────────────────── */
+.note{border:1px solid var(--rule);background:var(--washi-2);padding:1.15em 1.3em;margin:1.7rem 0;font-size:.88rem;line-height:1.95}
+.note--survey{border-left:3px solid var(--haicha)}
+.note--caution{border-left:3px solid var(--sumi)}
+.note--calm{border-left:3px solid var(--rule);background:transparent}
+.note__t{font-family:var(--sans);font-weight:600;color:var(--sumi-deep);margin:0 0 .5em;font-size:.98rem}
+.note__b :last-child{margin-bottom:0}
+
+/* 一次情報の原文引用。
+   公的機関の記載は、要約すると角が取れて意味が変わることがある。
+   責任の所在・罰則・期間といった、言い換えの効かない箇所は原文のまま置く。 */
+.quote{margin:1.8rem 0;padding:1.2em 1.45em;border-left:3px solid var(--sumi);background:var(--washi-2)}
+.quote p{font-family:var(--sans);font-size:1.02rem;line-height:2.05;color:var(--sumi-deep);margin:0}
+.quote cite{display:block;margin-top:.9em;font-family:var(--sans);font-style:normal;font-size:.78rem;letter-spacing:.04em;color:var(--haicha)}
+
+/* ── 線画イラストとアイコン（lib/illust.js）──────────────────
+   遺族が読む前提の大手18ページを調べた結果、ファーストビューに写真は必須ではなく、
+   線画SVG2色が標準解だった（いい葬儀・みんなの遺品整理とも）。
+   画像ファイルにしないので、第三者への通信も発生しない。 */
+.ill{margin:0}
+.ill svg{display:block;width:100%;height:auto}
+.ill--hero{border:1px solid var(--rule);background:var(--washi);box-shadow:var(--paper-shadow);overflow:hidden}
+.ill--mono{margin:1.8rem 0}
+.ill--mono svg{max-width:34rem;margin-inline:auto}
+
+/* ファーストビュー：文字の右にイラストを置く。
+   狭い画面では文字を先に読ませ、イラストはその下に小さく回す（結論先出しを崩さないため）。 */
+.fv{display:grid;grid-template-columns:1fr;gap:clamp(1.5rem,3.5vw,2.4rem);align-items:center}
+.fv__ill{width:100%;max-width:24rem;margin-inline:auto}
+@media (min-width:820px){
+  .fv{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(1.8rem,4vw,3.2rem)}
+  .fv__ill{max-width:none;margin-inline:0}
+}
+
+.ico{width:1.9em;height:1.9em;flex:0 0 auto;vertical-align:middle}
+.ico--lg{width:2.6em;height:2.6em}
+
+/* 記事の頭：分類のラベルに図柄を添える */
+.sec__eyebrow--ico{display:flex;align-items:center;gap:.6em}
+
+/* 記事一覧。カードを使わずテキストリンクで並べる。
+   大手10ページを調べた結果、記事が少ない一覧はカードを捨てるのがいちばん効いた。
+   カードは1件が大きいので、件数が少ないと余白のほうが目立つ。 */
+/* ── コラム一覧（大項目＝読者層／小項目＝分類）──────────
+   2026-08-17：階層が見分けられないという指摘を受けて作り直した。
+   大項目は左に太い墨藍の罫と地色の面を敷いて塊として見せ、
+   小項目は見出し＋件数、記事は太字タイトル＋1行要約の2段にする。 */
+.artgroup{position:relative}
+.artgroup__head{background:var(--ao-pale);border-left:4px solid var(--ao);border-radius:0 6px 6px 0;padding:1.35rem 1.5rem 1.2rem;margin-bottom:.6rem}
+.artgroup__eyebrow{display:flex;align-items:center;gap:.5em;margin:0 0 .5em;font-size:.72rem;letter-spacing:.16em;color:var(--haicha)}
+.artgroup__h{font-family:var(--sans);font-size:clamp(1.16rem,2.6vw,1.42rem);color:var(--sumi-deep);margin:0 0 .55em;display:flex;align-items:baseline;gap:.7em;flex-wrap:wrap}
+.artgroup__count{font-size:.72rem;font-family:var(--sans);font-weight:700;letter-spacing:.04em;color:#fff;background:var(--ao);border-radius:99px;padding:.28em .75em;line-height:1}
+.artgroup__desc{margin:0;font-size:.88rem;line-height:1.95;color:var(--haicha)}
+.artlist{display:grid;gap:1.6rem;margin-top:1.8rem}
+@media (min-width:720px){.artlist{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem 2.4rem}}
+.artlist__cat{border:1px solid var(--rule-soft);border-radius:6px;padding:0;overflow:hidden}
+.artlist__cath{display:flex;align-items:center;gap:.5em;margin:0;padding:.7em 1em;background:var(--washi-2);border-bottom:1px solid var(--rule-soft);font-family:var(--sans);font-size:.95rem;color:var(--sumi-deep);font-weight:600}
+.artlist__cath .ico{width:1.5em;height:1.5em}
+.artlist__catn{margin-left:auto;font-family:var(--sans);font-size:.7rem;font-weight:700;color:var(--haicha);background:var(--washi);border:1px solid var(--rule);border-radius:99px;min-width:1.7em;text-align:center;padding:.15em .5em;line-height:1.5}
+.artlist__items{list-style:none;margin:0;padding:0}
+.artlist__items li{margin:0;border-bottom:1px solid var(--rule-soft)}
+.artlist__items li:last-child{border-bottom:0}
+.artlist__items a{display:block;padding:.85em 2em .85em 1em;position:relative;text-decoration:none}
+.artlist__items a::after{content:"";position:absolute;right:1em;top:50%;margin-top:-.22em;width:.42em;height:.42em;border-top:1.5px solid var(--haicha);border-right:1.5px solid var(--haicha);transform:rotate(45deg)}
+.artlist__t{display:block;font-size:.95rem;font-weight:700;line-height:1.7;color:var(--sumi-deep)}
+.artlist__b{display:block;margin-top:.15em;font-size:.8rem;line-height:1.8;color:var(--haicha)}
+.artlist__items a:hover{background:var(--washi-2)}
+.artlist__items a:hover .artlist__t{color:var(--ao-deep)}
+.artlist__items a:hover::after{border-color:var(--ao-deep)}
+
+/* 節見出しの飾りは足していない。88行目に既に菱形のマーカーがあり、
+   そちらが確立した意匠なので、二重に付けない。 */
+.secmark{display:block;margin-bottom:.7em}
+.secmark svg{display:block;width:40px;height:16px}
+
+/* チェックリストの見出しにアイコンを添える */
+.chk__t .ico{margin-right:.45em;margin-top:-.15em}
+
+/* 分岐カードのアイコン。
+   カードは各ページに手書きで散らばっているので、**リンク先から自動で決まる**ようにする。
+   呼び出し側を1行も触らずに全ページへ行き渡り、新しく足したカードにも取りこぼしなく付く。
+   図柄は lib/illust.js の ICONS と同じもの（このブロックは同ファイルから生成した）。
+   並び順が意味を持つ。詳細度が同じなので、**汎用を先に・具体を後に**書いて後勝ちにしている。 */
+.branch{position:relative;padding-left:1.15rem}
+.branch::before{content:"";position:absolute;left:0;top:1.15rem;bottom:1.15rem;width:3px;border-radius:2px;background:var(--ao)}
+.branch[href^="/situation/"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%2712%27%20r%3D%275%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M14%2015%20L24%2025%20M20%2021%20L23%2018%20M23%2024%20L26%2021%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/guide/"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Ccircle%20cx%3D%2714%27%20cy%3D%2714%27%20r%3D%278%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M20%2020%20L27%2027%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M7%204%20H25%20V28%20H7%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2011%20H21%20M11%2016%20H21%20M11%2021%20H21%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2025%20H17%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/situation/genjokaifuku"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M8%205%20H24%20V27%20H8%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M12%2010%20H14%20M18%2010%20H20%20M12%2015%20H14%20M18%2015%20H20%20M12%2020%20H14%20M18%2020%20H20%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/situation/shoshu"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Ccircle%20cx%3D%2714%27%20cy%3D%2714%27%20r%3D%278%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M20%2020%20L27%2027%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/situation/ihinseiri"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M5%2010%20H27%20V26%20H5%20Z%20M5%2015%20H27%20M16%2010%20V15%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/guide/tetsuduki"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M6%208%20H26%20V27%20H6%20Z%20M6%2014%20H26%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%205%20V9%20M21%205%20V9%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2721%27%20cy%3D%2721%27%20r%3D%273%27%20fill%3D%27%23D9A05B%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/guide/nagare"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M5%2024%20H12%20V17%20H19%20V10%20H27%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/guide/hajimete"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M5%207%20H21%20V19%20H13%20L8%2024%20V19%20H5%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M25%2012%20H27%20V24%20H24%20V28%20L20%2024%20H14%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/hiyou"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%2711%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2010%20L16%2017%20L21%2010%20M11%2018%20H21%20M11%2022%20H21%20M16%2017%20V24%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/isshiki"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%2711%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2010%20L16%2017%20L21%2010%20M11%2018%20H21%20M11%2022%20H21%20M16%2017%20V24%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/kyoka"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M7%204%20H21%20L25%208%20V28%20H7%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2013%20H21%20M11%2018%20H21%20M11%2023%20H17%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2724%27%20r%3D%275%27%20fill%3D%27%23D9A05B%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/mukyoka"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M7%204%20H21%20L25%208%20V28%20H7%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2013%20H21%20M11%2018%20H21%20M11%2023%20H17%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2723%27%20cy%3D%2724%27%20r%3D%275%27%20fill%3D%27%23D9A05B%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/souzokuhouki"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M16%205%20L28%2026%20H4%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M16%2013%20V19%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2722.5%27%20r%3D%271.6%27%20fill%3D%27%23D9A05B%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/shikaku"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M16%204%20L26%208%20V16%20C26%2022%2021%2026%2016%2028%20C11%2026%206%2022%206%2016%20V8%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%2016%20L15%2020%20L22%2012%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/oya"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M6%208%20H26%20V27%20H6%20Z%20M6%2014%20H26%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M11%205%20V9%20M21%205%20V9%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2721%27%20cy%3D%2721%27%20r%3D%273%27%20fill%3D%27%23D9A05B%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/yubin"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M5%208%20H27%20V24%20H5%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M5%208%20L16%2017%20L27%208%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/rinshitsu"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M8%205%20H24%20V27%20H8%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M12%2010%20H14%20M18%2010%20H20%20M12%2015%20H14%20M18%2015%20H20%20M12%2020%20H14%20M18%2020%20H20%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/column/akushitsu"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M16%205%20L28%2026%20H4%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M16%2013%20V19%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2722.5%27%20r%3D%271.6%27%20fill%3D%27%23D9A05B%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/kijun"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M16%206%20V26%20M8%2026%20H24%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M6%2012%20H26%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M6%2012%20L3%2020%20H9%20Z%20M26%2012%20L23%2020%20H29%20Z%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/company"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Ccircle%20cx%3D%278%27%20cy%3D%2716%27%20r%3D%274%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%274%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Ccircle%20cx%3D%2724%27%20cy%3D%2716%27%20r%3D%274%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M12%2016%20H12.6%20M20%2016%20H20.6%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/nagoya"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M6%2015%20L16%206%20L26%2015%20M9%2015%20V26%20H23%20V15%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M14%2026%20V19%20H18%20V26%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/aichi"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M6%2015%20L16%206%20L26%2015%20M9%2015%20V26%20H23%20V15%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M14%2026%20V19%20H18%20V26%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+.branch[href^="/contact"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M5%207%20H21%20V19%20H13%20L8%2024%20V19%20H5%20Z%27%20fill%3D%27none%27%20stroke%3D%27%2322434E%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3Cpath%20d%3D%27M25%2012%20H27%20V24%20H24%20V28%20L20%2024%20H14%27%20fill%3D%27none%27%20stroke%3D%27%236B6257%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27square%27%20stroke-linejoin%3D%27miter%27%2F%3E%3C%2Fsvg%3E")}
+
+/* 用語集。語の説明に、根拠になる条文・公的文書の脚注をそのまま付けられるようにする。
+   「言葉の意味を、読者が自分で検証できる形で渡す」ためのもの。 */
+.gloss{margin:1.8rem 0;border-top:1px solid var(--rule)}
+.gloss__item{border-bottom:1px solid var(--rule-soft);padding:1.15em 0}
+.gloss__t{font-family:var(--sans);font-weight:600;font-size:1rem;color:var(--sumi-deep);margin:0 0 .35em}
+.gloss__d{margin:0;font-size:.88rem;line-height:1.95;color:var(--haicha)}
+.gloss__d strong{color:var(--sumi-deep)}
+
+/* 依頼者と会社の役割を分けた流れ（figSwimlane）。
+   既存の流れ図はどれも主語が会社で、読者の出番が図から読み取れない。
+   左列＝あなた／右列＝会社 に分け、左が空いている段は「待っていてよい」と分かるようにする。 */
+.lane{border:1px solid var(--rule);background:var(--washi)}
+.lane__head{display:grid;grid-template-columns:2.2rem 1fr 1fr;background:var(--sumi);color:var(--washi)}
+.lane__head span{padding:.7em 1em;font-size:.8rem;letter-spacing:.06em;font-family:var(--sans)}
+.lane__head .lane__h{grid-column:3}
+.lane__head .lane__h--you{grid-column:2;border-right:1px solid rgba(247,244,238,.25)}
+.lane__list{list-style:none;margin:0;padding:0}
+.lane__row{display:grid;grid-template-columns:2.2rem 1fr 1fr;border-top:1px solid var(--rule-soft)}
+.lane__row:first-child{border-top:0}
+.lane__n{display:flex;align-items:flex-start;justify-content:center;padding:1.05em .2em;font-size:.78rem;color:var(--haicha);background:var(--washi-2)}
+.lane__you,.lane__them{padding:1.05em 1.1em;font-size:.84rem;line-height:1.9}
+.lane__you{border-right:1px solid var(--rule-soft);color:var(--sumi-deep)}
+.lane__them{color:var(--haicha);background:var(--washi-2)}
+.lane__you b{font-weight:700}
+@media (max-width:640px){
+  .lane__head{grid-template-columns:1.9rem 1fr 1fr}
+  .lane__head span{padding:.6em .7em;font-size:.72rem}
+  .lane__row{grid-template-columns:1.9rem 1fr 1fr}
+  .lane__you,.lane__them{padding:.85em .75em;font-size:.78rem;line-height:1.85}
+}
+
+/* ── 費用のめやす ─────────────────────────────── */
+.costs{display:grid;gap:1rem;margin-top:1.7rem}
+@media (min-width:760px){.costs{grid-template-columns:repeat(2,1fr)}}
+.cost{border:1px solid var(--rule);padding:1.15rem 1.3rem;background:var(--washi)}
+.cost__t{font-family:var(--sans);font-size:.98rem;font-weight:600;margin:0 0 .5em}
+.cost__v{font-family:var(--sans);font-weight:600;font-size:1.28rem;color:var(--sumi-deep);margin:0 0 .5em;letter-spacing:.02em}
+.cost__b{font-size:.82rem;color:var(--haicha);margin:0;line-height:1.9}
+
+/* ── 時系列 ───────────────────────────────────── */
+.tl{list-style:none;padding:0;margin:1.7rem 0 0;border-left:1px solid var(--rule);}
+.tl li{position:relative;margin:0;padding:0 0 1.7rem 1.6rem}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:-4.5px;top:.72em;width:8px;height:8px;background:var(--washi);border:1px solid var(--sumi);transform:rotate(45deg)}
+.tl__when{font-family:var(--sans);font-size:.92rem;font-weight:600;color:var(--sumi-deep);display:block;margin-bottom:.35em}
+.tl__what{font-size:.88rem;line-height:1.95;margin:0;color:var(--haicha)}
+.tl__what strong{color:var(--sumi);font-weight:700}
+
+/* ── 分岐 ─────────────────────────────────────── */
+.branches{display:grid;gap:.9rem;margin-top:1.8rem}
+@media (min-width:760px){.branches{grid-template-columns:repeat(2,1fr)}}
+.branch{display:block;text-decoration:none;border:1px solid var(--rule);padding:1.15rem 1.3rem;background:var(--washi);transition:border-color .25s ease,transform .25s ease}
+.branch:hover{border-color:var(--sumi);transform:translateY(-1px)}
+.branch__t{font-family:var(--sans);font-size:1.02rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .45em}
+.branch__b{font-size:.83rem;color:var(--haicha);margin:0;line-height:1.9}
+
+/* ── 区の表 ───────────────────────────────────── */
+.wards{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.5rem 1.4rem;list-style:none;padding:0;margin:1.4rem 0 0;font-size:.83rem}
+.wards li{display:flex;justify-content:space-between;gap:.8em;border-bottom:1px dotted var(--rule);padding:.45em 0;margin:0;color:var(--haicha)}
+.wards b{font-weight:400;color:var(--sumi)}
+
+/* ── CTA（灯を使う唯一の場所）───────────────── */
+/* CTAの下余白と次の節の上余白が二重にならないようにする */
+.cta + .sec{padding-top:0}
+.cta:has(+ .thesis){margin-bottom:0}
+.cta{position:relative;margin-block:var(--band);background:var(--sumi-deep);color:var(--washi);overflow:hidden}
+.cta::after{content:"";position:absolute;inset:auto -10% -60% 30%;height:120%;background:radial-gradient(ellipse at 50% 100%,rgba(217,160,91,.30),transparent 62%);pointer-events:none}
+.cta__inner{position:relative;z-index:1;max-width:44rem;margin-inline:auto;padding:clamp(2.2rem,5.5vw,3.4rem) var(--gut);text-align:center}
+.cta__h{color:var(--washi);font-size:clamp(1.12rem,2.3vw,1.42rem);line-height:1.7;margin-bottom:.85em}
+.cta__body{color:rgba(247,244,238,.82);font-size:.88rem;line-height:2;margin-bottom:1.9em}
+.cta__actions{display:flex;flex-direction:column;align-items:center;gap:.85rem}
+.cta__tel{display:inline-flex;flex-direction:column;align-items:center;gap:.15em;text-decoration:none;background:var(--ao);color:var(--sumi-deep);padding:.85em 2.4em;min-width:16rem;border:1px solid var(--ao)}
+.cta__tel:hover{background:var(--ao-deep);color:var(--washi);border-color:var(--ao-deep)}
+.cta__tel-label{font-size:.78rem;letter-spacing:.08em}
+.cta__tel-num{font-family:var(--sans);font-size:1.42rem;font-weight:600;letter-spacing:.04em}
+.cta__whisper{font-size:.76rem;color:rgba(247,244,238,.7);margin:.2em 0 0}
+.cta__pending{font-size:.83rem;color:rgba(247,244,238,.72);line-height:1.95;max-width:30rem;margin:0 auto 0.4em;border:1px dashed rgba(247,244,238,.28);padding:.9em 1.1em}
+/* フォームのボタン。枠線だけの控えめな見た目では「押せる」と伝わらなかったため、
+   灯色の実面＋矢印＋影の、押せることが一目で分かる形にした（電話が無い間の主動線）。 */
+.cta__form{display:inline-flex;align-items:center;justify-content:center;gap:.7em;text-decoration:none;background:var(--ao);color:#fff;font-weight:700;font-size:1rem;letter-spacing:.03em;padding:1em 2.6em;min-width:min(20rem,100%);border:0;border-radius:6px;box-shadow:0 2px 0 rgba(0,0,0,.12),0 10px 24px -12px rgba(0,0,0,.5);transition:transform .12s ease,background .2s ease}
+.cta__form::after{content:"";width:.46em;height:.46em;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg)}
+.cta__form:hover{background:var(--ao-deep);color:#fff;transform:translateY(-1px)}
+.cta__form:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+
+/* ── 追従バー ─────────────────────────────────── */
+/* 追従バー。白地に浮かせ、ボタンとして分かる形（角丸・影・十分な高さ）にする。 */
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-top:1px solid var(--rule);box-shadow:0 -6px 20px -14px rgba(16,42,51,.45)}
+.sticky__inner{max-width:36rem;margin-inline:auto;display:flex;gap:.55rem;padding:.62rem var(--gut) calc(.62rem + env(safe-area-inset-bottom))}
+.sticky__tel,.sticky__form{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1em;text-align:center;text-decoration:none;font-size:.9rem;font-weight:700;letter-spacing:.02em;min-height:2.9em;padding:.5em .6em;border-radius:6px;border:1px solid transparent;line-height:1.4}
+.sticky__tel{background:var(--ao);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 2px 8px -4px rgba(166,106,38,.6)}
+.sticky__tel:hover{background:var(--ao-deep);color:#fff}
+.sticky__tel span{display:block;font-family:var(--sans);font-size:.96rem;font-weight:600}
+.sticky__form{background:var(--ao);color:#fff;box-shadow:0 2px 8px -4px rgba(0,85,156,.7)}
+.sticky__form::after{content:"";width:.42em;height:.42em;border-top:1.6px solid currentColor;border-right:1.6px solid currentColor;transform:rotate(45deg);margin-left:.55em;position:absolute;right:1.1em;top:50%;margin-top:-.28em}
+.sticky__form{position:relative}
+.sticky__form:hover{background:var(--ao-deep);color:#fff}
+
+/* ── FAQ ──────────────────────────────────────── */
+.faq{margin-top:1.5rem;border-top:1px solid var(--rule)}
+.faq__item{border-bottom:1px solid var(--rule)}
+.faq__q{font-family:var(--sans);font-size:.98rem;font-weight:600;color:var(--sumi-deep);padding:1.05em 2.2em 1.05em 0;cursor:pointer;position:relative;line-height:1.7;list-style:none}
+.faq__q::-webkit-details-marker{display:none}
+.faq__q::after{content:"";position:absolute;right:.5em;top:1.55em;width:.5em;height:.5em;border-right:1px solid var(--haicha);border-bottom:1px solid var(--haicha);transform:rotate(45deg);transition:transform .3s ease}
+.faq__item[open] .faq__q::after{transform:rotate(-135deg)}
+.faq__a{padding:0 0 1.25em;font-size:.88rem;line-height:2;color:var(--haicha)}
+.faq__a p:last-child{margin-bottom:0}
+
+/* ── 出典 ─────────────────────────────────────── */
+.cite{font-size:.62em;vertical-align:.42em;margin-left:.12em;font-family:var(--sans)}
+.cite a{text-decoration:none;color:var(--haicha);border-bottom:1px solid var(--rule)}
+.sources{border-top:1px solid var(--rule);padding-block:2.6rem 0;margin-top:var(--band)}
+.sources h2{font-size:1rem;margin-bottom:1.1em}
+.sources__list{font-size:.76rem;color:var(--haicha);line-height:1.95;padding-left:1.5em}
+.sources__list li{margin-bottom:.7em}
+.sources__pub{color:var(--sumi)}
+.sources__list a{color:var(--haicha);word-break:break-all}
+.sources__date{white-space:nowrap}
+.sources__note{font-size:.76rem;color:var(--haicha);margin-top:1.4em;line-height:1.95}
+
+/* ── フッター ─────────────────────────────────── */
+.foot{border-top:1px solid var(--rule);background:var(--washi-2);margin-top:var(--band)}
+.foot__inner{max-width:74rem;margin-inline:auto;padding:clamp(2.4rem,5vw,3.4rem) var(--gut) 1.8rem;display:grid;gap:2.2rem}
+@media (min-width:820px){.foot__inner{grid-template-columns:1fr 2fr}}
+.foot__name{font-family:var(--sans);font-size:1.08rem;font-weight:600;letter-spacing:.08em;margin:0 0 .6em;color:var(--sumi-deep)}
+.foot__tag{font-size:.78rem;color:var(--haicha);line-height:2;margin:0}
+.foot__nav{display:grid;gap:1.7rem}
+@media (min-width:560px){.foot__nav{grid-template-columns:repeat(3,1fr)}}
+.foot__h{font-family:var(--sans);font-size:.82rem;font-weight:600;margin:0 0 .8em;color:var(--sumi-deep)}
+.foot__nav ul{list-style:none;padding:0;margin:0;font-size:.79rem}
+.foot__nav li{margin:.5em 0}
+.foot__nav a{color:var(--haicha);text-decoration:none}
+.foot__nav a:hover{color:var(--sumi);text-decoration:underline}
+.foot__pr{max-width:74rem;margin:0 auto;padding:0 var(--gut) 1.2rem;font-size:.72rem;color:var(--haicha);line-height:1.9}
+.foot__copy{max-width:74rem;margin:0 auto;padding:0 var(--gut) 2rem;font-size:.7rem;color:var(--haicha)}
+
+/* ── フォーム ─────────────────────────────────── */
+.form{max-width:38rem;margin-top:2rem}
+.field{margin-bottom:1.5rem}
+.field__l{display:block;font-size:.85rem;margin-bottom:.5em;color:var(--sumi)}
+.field__l .req{font-size:.7rem;border:1px solid var(--rule);padding:.05em .45em;margin-left:.6em;color:var(--haicha)}
+.field__h{font-size:.76rem;color:var(--haicha);margin:.45em 0 0;line-height:1.85}
+/* 入力欄だけは端末の書体にする。書体を実際に使う文字だけに絞っているため、
+   利用者が打った文字が豆腐（□）になるのを避ける。 */
+.field input[type=text],.field input[type=email],.field input[type=tel],.field textarea,.field select{
+  width:100%;font-family:"Hiragino Sans","Yu Gothic UI",system-ui,sans-serif;
+  /* 16px を下回らないこと。iOS Safari は 16px 未満の入力欄をタップすると
+     自動でズームインし、そのまま拡大された状態で残る。動揺している方が
+     片手で操作する前提なので、ここは詰めない。 */
+  font-size:max(16px,.95rem);padding:.7em .85em;border:1px solid var(--rule);background:var(--washi);color:var(--sumi);border-radius:2px;line-height:1.7
+}
+.field textarea{min-height:9em;resize:vertical}
+.field__radios{display:grid;gap:.55rem;margin-top:.3rem}
+.field__radios label{display:flex;gap:.6em;align-items:flex-start;font-size:.88rem;line-height:1.8;border:1px solid var(--rule);padding:.7em .9em;background:var(--washi);cursor:pointer}
+.field__radios input{margin-top:.42em;flex:none;accent-color:var(--sumi)}
+.btn-submit{font-family:inherit;font-size:.95rem;background:var(--sumi-deep);color:var(--washi);border:0;padding:.9em 2.6em;cursor:pointer;letter-spacing:.06em}
+.btn-submit:hover{background:var(--sumi)}
+
+/* ── 静かに現れる（動きはこれだけ）───────────── */
+[data-animate]{opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+[data-animate].is-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  [data-animate]{opacity:1;transform:none;transition:none}
+  .branch{transition:none}
+}
+
+/* ══════════════════════════════════════════════════════
+   ランキング表示まわり
+   実在のランキングサイト23件を調べて共通していた型に合わせている。
+   ══════════════════════════════════════════════════════ */
+
+/* ── 目次（21/23のサイトが設置。リード文の後・最初のH2の前）── */
+/* 目次。地味で気づかれなかったため、朱の左罫＋大きな見出し＋番号を朱に。
+   長い記事（コラム）でも「ここから飛べる」と分かるようにする。 */
+.toc{border:1px solid var(--rule-soft);border-left:4px solid var(--ao);border-radius:0 6px 6px 0;background:var(--sora-pale);padding:1.4rem 1.6rem;margin-top:clamp(2rem,4vw,2.8rem)}
+.toc__h{font-family:var(--sans);font-size:1.12rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .9em;padding-bottom:.55em;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:.5em}
+.toc__h::before{content:"";width:.5em;height:.5em;border-right:2px solid var(--ao);border-bottom:2px solid var(--ao);transform:rotate(45deg);margin-top:-.2em}
+.toc__list{margin:0;padding:0;list-style:none;counter-reset:toc;columns:2;column-gap:2.4rem}
+@media (max-width:720px){.toc__list{columns:1}}
+.toc__list li{counter-increment:toc;margin:.5em 0;font-size:.92rem;break-inside:avoid;display:flex;gap:.6em;align-items:baseline}
+.toc__list li::before{content:counter(toc);flex:none;color:#fff;background:var(--ao);border-radius:99px;min-width:1.55em;height:1.55em;display:inline-flex;align-items:center;justify-content:center;font-size:.72em;font-weight:700;line-height:1}
+.toc__list a{color:var(--sumi);text-decoration:none;border-bottom:1px solid transparent;font-weight:500}
+.toc__list a:hover{color:var(--ao-deep);border-bottom-color:var(--ao)}
+
+/* ── ★ ────────────────────────────────────────── */
+.stars{display:inline-flex;align-items:center;gap:.45em;white-space:nowrap}
+.stars__track{position:relative;display:inline-block;color:var(--washi-3);letter-spacing:.08em;font-size:1.4rem;line-height:1}
+.stars__fill{position:absolute;left:0;top:0;overflow:hidden;color:var(--dai);white-space:nowrap;letter-spacing:.08em}
+.stars__val{font-family:var(--sans);font-weight:700;font-size:1.6rem;color:var(--dai-deep);letter-spacing:.01em}
+.stars--sm .stars__track{font-size:.9rem}
+.stars--sm .stars__val{font-size:.95rem}
+
+/* ── 結論の先出し ─────────────────────────────── */
+.verdict{border:1px solid var(--sumi);background:var(--washi);margin-top:1.9rem}
+.verdict__h{font-family:var(--sans);font-size:.95rem;font-weight:600;color:var(--washi);background:var(--sumi-deep);margin:0;padding:.7em 1.1em;letter-spacing:.06em}
+.verdict__list{list-style:none;margin:0;padding:.5rem 1.1rem .9rem;counter-reset:none}
+.verdict__item{display:flex;align-items:center;gap:.85em;padding:.75em 0;margin:0;border-bottom:1px dotted var(--rule)}
+.verdict__item:last-child{border-bottom:0}
+.verdict__rank{flex:none;width:2.6em;text-align:center;font-family:var(--sans);font-weight:600;font-size:.82rem;color:var(--sumi);border:1px solid var(--rule);padding:.2em 0;background:var(--washi-2)}
+.verdict__item:first-child .verdict__rank{background:var(--sumi-deep);color:var(--washi);border-color:var(--sumi-deep)}
+.verdict__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:.1em}
+.verdict__name{font-size:.94rem;color:var(--sumi-deep);text-decoration:none;border-bottom:1px solid var(--rule)}
+.verdict__why{font-size:.76rem;color:var(--haicha);line-height:1.7}
+.verdict__note{font-size:.74rem;color:var(--haicha);margin:0;padding:0 1.1rem 1rem;line-height:1.8}
+@media (max-width:560px){
+  .verdict__item{flex-wrap:wrap}
+  .verdict__body{flex-basis:calc(100% - 3.5em)}
+  .verdict__item .stars{margin-left:3.45em}
+}
+
+/* ── 各社カード ───────────────────────────────── */
+.rank{scroll-margin-top:1.2rem}
+.rank__head{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:1rem}
+
+/* ── 順位バッジ（2026-08-17：地味という指摘を受けて作り直した）──
+   順位を丸いメダルにして、金・銀・銅で一目で分かるようにする。
+   1位だけは「王冠＋金の面」で明確に差を付ける。数字は大きく。 */
+.rank__badge{flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:.44em .7em;font-family:var(--sans);font-weight:700;font-size:.64em;line-height:1;letter-spacing:.05em;color:#fff;background:var(--gin)}
+.rank__badge::after{content:"位"}
+.sec__h--rank{display:flex;align-items:flex-start;gap:.7em}
+.sec__h--rank .rank__badge{margin-top:.22em}
+.rank__badge--top{background:var(--ao)}
+.rank__badge--2{background:var(--gin)}
+.rank__badge--3{background:var(--dou)}
+.rank__ttl{min-width:0}
+.rank__name{font-size:1.18rem;line-height:1.55;margin:0}
+.rank__name a{text-decoration:none;border-bottom:1px solid var(--rule)}
+.rank__lede{font-size:.86rem;color:var(--haicha);margin:.35em 0 0;line-height:1.75}
+.rank__score{display:flex;align-items:center;flex-wrap:wrap;gap:.6em 1.2em;padding:.75em 0;border-block:1px solid var(--rule-soft)}
+.rank__price{font-family:var(--sans);font-weight:600;font-size:1.02rem;color:var(--sumi-deep)}
+.rank__pr{font-size:.7rem;color:var(--haicha);border:1px solid var(--rule);padding:.15em .6em}
+.rank__sum{font-size:.9rem;line-height:1.95;margin:1.1em 0 0;color:var(--sumi)}
+
+.pts{margin-top:1.3rem;border:1px solid var(--rule);background:var(--washi-2);padding:1.1rem 1.2rem}
+.pts__h{font-family:var(--sans);font-size:.88rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .7em;letter-spacing:.04em}
+.pts__list{list-style:none;margin:0;padding:0}
+.pts__list li{display:flex;gap:.8em;align-items:flex-start;margin:.55em 0;font-size:.88rem;line-height:1.85}
+.pts__n{flex:none;font-size:.66rem;letter-spacing:.08em;color:var(--haicha);border:1px solid var(--rule);padding:.25em .5em;margin-top:.25em;white-space:nowrap}
+.pts__t{flex:1}
+
+.spec{border-collapse:collapse;width:100%;margin-top:1.3rem;font-size:.84rem}
+.spec th,.spec td{border-bottom:1px solid var(--rule-soft);padding:.6em .7em;text-align:left;vertical-align:top;line-height:1.75}
+.spec th{width:12em;font-weight:400;color:var(--haicha);background:var(--washi-2)}
+.spec tr:last-child th,.spec tr:last-child td{border-bottom:0}
+@media (max-width:560px){.spec th{width:8.5em;font-size:.94em}}
+
+.rank__caution{margin-top:1.2rem;border-left:3px solid var(--haicha);background:var(--washi-2);padding:.9em 1.1em;font-size:.83rem;line-height:1.9;color:var(--haicha)}
+.rank__caution-h{font-family:var(--sans);font-weight:600;color:var(--sumi-deep);margin:0 0 .3em;font-size:.88rem}
+.rank__caution p:last-child{margin:0}
+.rank__survey{margin-top:1.2rem;padding-top:1rem;border-top:1px dashed var(--rule)}
+.rank__survey-t{font-size:.76rem;color:var(--haicha);margin:.6em 0 0;line-height:1.85}
+.rank__cta{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.5rem}
+.rank__src{font-size:.72rem;color:var(--haicha);margin:1em 0 0;line-height:1.8}
+
+.btn-main{display:inline-flex;align-items:center;justify-content:center;gap:.6em;flex:1 1 16rem;text-align:center;text-decoration:none;background:var(--ao);color:#fff;border:0;border-radius:6px;padding:1em 1.7em;font-size:1rem;font-weight:700;letter-spacing:.02em;box-shadow:0 2px 0 rgba(0,0,0,.12),0 8px 20px -10px rgba(0,108,195,.55)}
+.btn-main::after{content:"";width:.44em;height:.44em;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg)}
+.btn-main:hover{background:var(--ao-deep);color:#fff;transform:translateY(-1px)}
+.btn-sub{display:inline-flex;align-items:center;justify-content:center;flex:0 1 12rem;text-align:center;text-decoration:none;border:1px solid var(--sumi);color:var(--sumi);padding:.85em 1.3em;font-size:.86rem}
+.btn-sub:hover{background:var(--sumi);color:var(--washi)}
+
+/* ── 選び方 ───────────────────────────────────── */
+.choose{display:grid;gap:1.3rem;margin-top:1.9rem}
+@media (min-width:860px){.choose{grid-template-columns:repeat(2,1fr);gap:1.6rem 2.2rem}}
+.choose__item{display:flex;gap:1rem;align-items:flex-start;border-top:2px solid var(--sumi);padding-top:1.05rem}
+.choose__n{flex:none;font-family:var(--sans);font-size:1.5rem;font-weight:600;color:var(--sumi);line-height:1;margin:0;min-width:1.2em}
+.choose__t{font-family:var(--sans);font-size:1.02rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .5em;line-height:1.6}
+.choose__b{font-size:.86rem;line-height:1.95;color:var(--haicha);margin:0}
+.choose__b strong{color:var(--sumi)}
+
+/* ── 事実リスト（市の窓口・ごみ実務）───────────── */
+.facts{list-style:none;padding:0;margin:1.6rem 0 0;display:grid;gap:1.15rem}
+.facts li{margin:0;font-size:.88rem;line-height:1.95}
+.facts b{display:block;font-family:var(--sans);font-weight:600;color:var(--sumi-deep);font-size:.95rem;margin-bottom:.3em}
+.facts span{color:var(--haicha)}
+.facts em{font-style:normal;color:var(--sumi)}
+
+.ctable__rank{font-family:var(--sans);font-weight:600;color:var(--sumi);white-space:nowrap}
+.ctable__area{font-size:.92em;color:var(--haicha);min-width:11rem}
+
+/* ── 調査中の事業者（順位に入れないもの）───────── */
+.pending{border:1px dashed var(--rule);background:var(--washi-2);padding:1.3rem 1.4rem;margin-top:1.8rem}
+.pending__h{font-family:var(--sans);font-size:.94rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .5em}
+.pending__b{font-size:.82rem;color:var(--haicha);line-height:1.9;margin:0 0 1em}
+.pending__list{list-style:none;margin:0;padding:0}
+.pending__list li{display:flex;flex-wrap:wrap;gap:.2em .9em;align-items:baseline;padding:.5em 0;margin:0;border-top:1px dotted var(--rule);font-size:.87rem}
+.pending__list span{font-size:.78rem;color:var(--haicha)}
+
+/* ══════════════════════════════════════════════════════
+   悩み訴求型LPの部品
+   実サイト18件を調べて共通していた順序と要素に合わせている。
+   ══════════════════════════════════════════════════════ */
+
+.hero__sub{display:block;font-size:.52em;color:var(--haicha);margin-top:.9em;letter-spacing:.06em;font-weight:400;line-height:1.7}
+
+/* 共感コピー（実サイト13/18が冒頭に設置） */
+.voices{list-style:none;margin:1.9rem 0 0;padding:0;border-left:3px solid var(--rule);padding-left:1.15rem}
+.voices li{margin:.5em 0;font-size:.94rem;line-height:1.9;color:var(--sumi);position:relative}
+.voices li::before{content:"「";color:var(--haicha)}
+.voices li::after{content:"」";color:var(--haicha)}
+
+/* ランキングへ飛ばすアンカー */
+.jump{margin:1.7rem 0 0}
+.jump a{display:inline-flex;align-items:center;gap:.5em;text-decoration:none;border:1.5px solid var(--ao);color:var(--ao-deep);background:var(--washi);border-radius:6px;font-weight:700;padding:.75em 1.5em;font-size:.9rem}
+.jump a:hover{background:var(--ao);color:#fff}
+.jump span{font-size:.75em}
+
+.sec__eyebrow{font-family:var(--sans);font-size:.88rem;font-weight:700;color:var(--dai-deep);margin:0 0 .5em;letter-spacing:.08em}
+.sub{font-size:1.08rem;font-weight:700;color:var(--dai-deep);margin:2.6rem 0 .9em;padding-bottom:.45em;border-bottom:2px dotted rgba(232,128,31,.5)}
+.sec__h--rank{display:flex;align-items:center;gap:.7em;flex-wrap:wrap;padding-left:0}
+.sec__h--rank::before{display:none}
+.rank-sec{scroll-margin-top:1rem}
+
+/* ── 図解の共通枠 ─────────────────────────────── */
+.fig{margin:1.9rem 0 0;padding:0}
+.fig__svg{display:block;width:100%;height:auto;font-family:var(--sans)}
+.fig__cap{font-size:.78rem;color:var(--haicha);line-height:1.9;margin-top:1em;padding-left:.9em;border-left:2px solid var(--rule)}
+
+/* ── 写真（assets/photos/ ＋ data/photos.json）────────
+   彩度を CSS 側でも一段落として、墨藍・和紙の4色から浮かないようにする。
+   （被写体と色調の決まりは assets/photos/README.md） */
+.ph{margin:1.9rem 0 0;padding:0}
+.ph img{display:block;width:100%;height:auto;border:1px solid var(--rule-soft);border-radius:2px;filter:saturate(.82) contrast(.98) brightness(1.01)}
+.ph--hero{margin-top:clamp(1.6rem,3.5vw,2.4rem)}
+
+/* 図1：できることの比較表 */
+.cmp{margin-top:1.9rem;overflow-x:auto}
+.cmp__t{border-collapse:collapse;width:100%;min-width:38rem;font-size:.82rem;background:var(--washi)}
+.cmp__t th,.cmp__t td{border:1px solid var(--rule-soft);padding:.7em .8em;text-align:left;vertical-align:top;line-height:1.75}
+.cmp__t thead th{background:var(--washi-2);font-family:var(--sans);font-weight:600;text-align:center;font-size:.84rem}
+.cmp__t tbody th{background:var(--washi-2);font-weight:400;color:var(--haicha);width:9em}
+.cmp__t .cmp__best{background:var(--sumi-deep);color:var(--washi);border-color:var(--sumi-deep)}
+.cmp__t td.cmp__best{background:rgba(34,67,78,.07);color:var(--sumi);border-color:var(--rule)}
+.cmp__note{font-size:.76rem;color:var(--haicha);margin:.9em 0 0;line-height:1.85}
+
+/* 図3：見積書 */
+.est{border:1px solid var(--sumi);background:var(--washi);padding:1.3rem 1.4rem}
+.est__h{font-family:var(--sans);font-size:.95rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .9em;padding-bottom:.5em;border-bottom:2px solid var(--sumi);letter-spacing:.2em}
+.est__list{list-style:none;margin:0;padding:0}
+.est__list li{display:grid;grid-template-columns:1.9em 9.5em 1fr auto;gap:.5em;align-items:baseline;padding:.55em 0;margin:0;border-bottom:1px dotted var(--rule);font-size:.83rem}
+@media (max-width:640px){.est__list li{grid-template-columns:1.9em 1fr auto}.est__list .est__v{grid-column:2 / -1;padding-top:.2em}}
+.est__n{color:var(--haicha);font-size:.85em}
+.est__k{color:var(--sumi);font-weight:700}
+.est__v{color:var(--haicha);font-size:.94em;line-height:1.75}
+.est__amt{color:var(--rule);white-space:nowrap}
+.est__bad{margin:1.1em 0 0;padding:.7em .9em;background:var(--washi-2);border:1px dashed var(--rule);font-size:.83rem;color:var(--haicha)}
+.est__bad span{display:inline-block;font-size:.78em;border:1px solid var(--haicha);padding:.1em .5em;margin-right:.7em;color:var(--sumi)}
+
+/* 図5：流れ */
+.flow{list-style:none;margin:1.9rem 0 0;padding:0;display:grid;gap:.7rem}
+@media (min-width:820px){.flow{grid-template-columns:repeat(5,1fr);gap:.6rem}}
+.flow__i{display:flex;flex-direction:column;gap:.3em;margin:0;border:1px solid var(--rule);background:var(--washi);padding:.95rem 1rem;position:relative}
+@media (min-width:820px){
+  .flow__i::after{content:"";position:absolute;right:-.55rem;top:50%;width:.5rem;height:.5rem;border-top:1px solid var(--rule);border-right:1px solid var(--rule);transform:translateY(-50%) rotate(45deg);z-index:1}
+  .flow__i:last-child::after{display:none}
+}
+.flow__n{font-size:.66rem;letter-spacing:.1em;color:var(--haicha)}
+.flow__t{font-family:var(--sans);font-size:1rem;font-weight:600;color:var(--sumi-deep)}
+.flow__b{font-size:.76rem;color:var(--haicha);line-height:1.8}
+
+/* 図6：選び方チェックリスト */
+.chk{display:grid;gap:.9rem;margin-top:1.7rem}
+@media (min-width:900px){.chk{grid-template-columns:repeat(3,1fr)}}
+.chk__i{border:1px solid var(--rule);background:var(--washi);padding:1.15rem 1.2rem;position:relative}
+.chk__n{position:absolute;top:-1px;left:-1px;background:var(--sumi-deep);color:var(--washi);font-family:var(--sans);font-size:.85rem;padding:.25em .75em}
+.chk__t{font-family:var(--sans);font-size:1rem;font-weight:600;color:var(--sumi-deep);margin:1.9em 0 .5em;line-height:1.6}
+.chk__b{font-size:.82rem;color:var(--haicha);line-height:1.9;margin:0 0 .9em}
+.chk__ask{font-size:.8rem;color:var(--sumi);margin:0;padding-top:.75em;border-top:1px dotted var(--rule);line-height:1.8}
+.chk__ask span{display:block;font-size:.82em;color:var(--haicha);margin-bottom:.2em}
+
+/* ── 各社ブロック ─────────────────────────────── */
+.rank__badge2{font-size:.74rem;color:var(--sumi);border:1px solid var(--rule);padding:.25em .7em;background:var(--washi-2)}
+.pt{margin-top:1.4rem;padding:.9rem 1.1rem;border-left:3px solid var(--ao);background:var(--ao-pale);border-radius:0 6px 6px 0}
+.pt__h{font-family:var(--sans);font-size:1rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .5em;line-height:1.65}
+.pt__n{display:inline-block;font-family:var(--sans);font-size:.66rem;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--ao);border-radius:3px;padding:.3em .65em;margin-right:.75em;vertical-align:.16em}
+.pt__b{font-size:.9rem;line-height:1.95;color:var(--sumi);margin:0}
+.rec{margin-top:1.4rem;background:var(--washi-2);border:1px solid var(--rule);padding:1rem 1.2rem}
+.rec__h{font-family:var(--sans);font-size:.9rem;font-weight:600;color:var(--sumi-deep);margin:0 0 .5em}
+.rec ul{margin:0;padding-left:1.2em;font-size:.85rem;line-height:1.9;color:var(--haicha)}
+
+/* 迷ったら1位 */
+.final__lead{font-size:.95rem;line-height:2;margin-bottom:1.2em}
+.final__why{list-style:none;margin:0 0 1.4em;padding:0;display:grid;gap:.5rem}
+.final__why li{margin:0;font-size:.9rem;line-height:1.8;padding-left:1.7em;position:relative;color:var(--sumi)}
+.final__why li::before{content:"";position:absolute;left:0;top:.62em;width:.52em;height:.28em;border-left:2px solid var(--sumi);border-bottom:2px solid var(--sumi);transform:rotate(-45deg)}
+.final__b{font-size:.88rem;line-height:1.95;color:var(--haicha)}
+.final__cta{margin-top:1.7rem;display:flex}
+
+/* 悪質業者 */
+.warn{border:1px solid var(--sumi);background:var(--washi)}
+.warn__h{font-family:var(--sans);font-size:.94rem;font-weight:600;color:var(--washi);background:var(--sumi-deep);margin:0;padding:.7em 1.2em;letter-spacing:.04em}
+.warn__list{list-style:none;margin:0;padding:1rem 1.3rem}
+.warn__list li{margin:0;padding:.85em 0;border-bottom:1px dotted var(--rule);font-size:.86rem;line-height:1.95;color:var(--haicha)}
+.warn__list li:last-child{border-bottom:0}
+.warn__list b{display:block;color:var(--sumi-deep);font-family:var(--sans);font-size:.98rem;margin-bottom:.25em}
+.warn__foot{font-size:.83rem;color:var(--sumi);margin:0;padding:1em 1.3rem;background:var(--washi-2);border-top:1px solid var(--rule);line-height:1.9}
+.warn__foot b{font-size:1.1em}
+
+/* TOP3比較表：列＝会社、行＝項目 */
+.ctable__rk{display:block;font-size:.72rem;color:var(--haicha);margin-bottom:.2em}
+/* 1位の列は金でハイライト（濃紺のベタは重く、暗い印象の原因だった） */
+.ctable thead th.ctable__top{background:var(--ao);color:#fff;position:relative}
+.ctable thead th.ctable__top .ctable__rk{color:rgba(255,255,255,.9);font-weight:700}
+.ctable thead th.ctable__top a{color:#fff}
+.ctable td.ctable__top{background:var(--ao-pale);font-weight:700;color:var(--sumi-deep)}
+
+/* ヒーローは1カラム。共感コピー→リード→ランキングへのアンカーだけを置く */
+.hero__body{margin-top:clamp(1.6rem,3.5vw,2.4rem);max-width:44rem}
+.hero__body .hero__lead{max-width:none}
+
+/* ── 費用の目安表 ─────────────────────────────── */
+.ptable{overflow-x:auto;border:1px solid var(--rule);background:var(--washi)}
+.ptable table{border-collapse:collapse;width:100%;min-width:32rem;font-size:.86rem}
+.ptable th,.ptable td{border-bottom:1px solid var(--rule-soft);padding:.8em .9em;text-align:left;line-height:1.7}
+.ptable thead th{background:var(--sumi-deep);color:var(--washi);font-family:var(--sans);font-weight:600;font-size:.85rem;border-bottom:0}
+.ptable tbody th{background:var(--washi-2);font-weight:400;color:var(--sumi);white-space:nowrap}
+.ptable tbody tr:last-child th,.ptable tbody tr:last-child td{border-bottom:0}
+.ptable__v{font-family:var(--sans);font-weight:600;color:var(--sumi-deep);font-size:1.02em;white-space:nowrap}
+.ptable--unit tbody th{white-space:normal}
+
+/* ── 消臭保証の実態 ───────────────────────────── */
+.gr{border:1px solid var(--sumi);background:var(--washi)}
+.gr__h{font-family:var(--sans);font-size:.95rem;font-weight:600;color:var(--washi);background:var(--sumi-deep);margin:0;padding:.75em 1.2em;letter-spacing:.04em}
+.gr__nums{display:grid;gap:0;border-bottom:1px solid var(--rule)}
+@media (min-width:700px){.gr__nums{grid-template-columns:repeat(3,1fr)}}
+.gr__n{padding:1.4rem 1.2rem;text-align:center;border-bottom:1px solid var(--rule-soft)}
+@media (min-width:700px){.gr__n{border-bottom:0;border-right:1px solid var(--rule-soft)}.gr__n:last-child{border-right:0}}
+.gr__n b{font-family:var(--sans);font-size:2.6rem;line-height:1;color:var(--sumi-deep);display:inline-block}
+.gr__n span{font-size:.86rem;color:var(--haicha);margin-left:.2em}
+.gr__n em{display:block;font-style:normal;font-size:.8rem;color:var(--haicha);line-height:1.75;margin-top:.7em}
+.gr__n strong{color:var(--sumi)}
+.gr__n--hot{background:rgba(217,160,91,.12)}
+.gr__n--hot b{color:var(--ao-deep)}
+.gr__b{font-size:.88rem;line-height:1.95;color:var(--haicha);margin:0;padding:1.1em 1.3rem 0}
+.gr__b:last-of-type{padding-bottom:.4em}
+.gr__foot{font-size:.76rem;color:var(--haicha);margin:1em 0 0;padding:1em 1.3rem;background:var(--washi-2);border-top:1px solid var(--rule);line-height:1.9}
+
+/* チェックリスト4項目 */
+@media (min-width:760px){.chk--4{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1080px){.chk--4{grid-template-columns:repeat(4,1fr)}}
+.chk__i--hot{border-color:var(--ao);border-width:2px}
+.chk__i--hot .chk__n{background:var(--ao-deep)}
+
+/* ── 1位のカードを明確に差別化（2026-08-17）──────────
+   「墓のランキングと比べて地味」という指摘への対応。
+   1位の節だけ金の枠と淡金の面を敷き、右上に「編集部の一番」の帯を出す。
+   煽り文句は入れない（規律：恐怖の増幅と大げさな断定はしない）。 */
+.rank-sec--top{position:relative;background:#F5FAFE;border:2px solid var(--ao);border-radius:10px;padding:1.6rem clamp(1.1rem,3vw,1.9rem) 1.9rem;margin-top:1.2rem;box-shadow:0 10px 30px -22px rgba(0,85,156,.55)}
+.rank-sec--top::before{content:"編集部の一番";position:absolute;top:-.95em;right:1.2rem;background:var(--ao);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.08em;padding:.42em 1em;border-radius:99px;box-shadow:0 2px 6px -2px rgba(0,0,0,.4)}
+.rank-sec--top .sec__h--rank{margin-top:.3em}
+@media (max-width:560px){.rank-sec--top::before{right:auto;left:1rem}}
+
+/* ── ロゴ導入と参考サイトの型の移植（2026-08-17）────────
+   ロゴ（青×ティール）から採色。金・王冠・絵文字アイコンは廃止。
+   ボタン#006CC3は白文字5.34、橙文字#B45708は白地4.88でAA合格を機械確認済み。 */
+.head__right{display:flex;align-items:center;gap:.6rem}
+.head__cta{display:inline-flex;align-items:center;gap:.5em;background:var(--ao);color:#fff;text-decoration:none;font-size:.82rem;font-weight:700;padding:.66em 1.05em;border-radius:6px;white-space:nowrap}
+.head__cta::after{content:"";width:.38em;height:.38em;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg)}
+.head__cta:hover{background:var(--ao-deep)}
+@media (max-width:479px){.head__cta{font-size:.76rem;padding:.6em .8em}}
+@media (min-width:768px){
+  .head__menu{position:relative}
+  .head__menu[open] .head__nav{display:flex;flex-direction:column;position:absolute;right:0;top:calc(100% + .55rem);min-width:17rem;background:var(--washi);border:1px solid var(--rule);border-radius:8px;box-shadow:0 14px 34px -14px rgba(16,42,51,.4);padding:.3rem 1.2rem .5rem;z-index:30}
+  .head__menu[open] .head__nav a{padding:.9em 0;border-bottom:1px solid var(--rule-soft);color:var(--sumi)}
+  .head__menu[open] .head__nav a:last-child{border-bottom:0}
+}
+.cta__bubble{display:table;margin:0 auto .8rem;position:relative;background:#fff;border:1.5px solid var(--ao);color:var(--ao-deep);font-size:.84rem;font-weight:700;letter-spacing:.04em;padding:.5em 1.3em;border-radius:99px}
+.cta__bubble::after{content:"";position:absolute;left:50%;bottom:-.42em;margin-left:-.32em;width:.6em;height:.6em;background:#fff;border-right:1.5px solid var(--ao);border-bottom:1.5px solid var(--ao);transform:rotate(45deg)}
+.fv__ill .ph img{border-radius:10px}
+.read a{color:var(--ao-deep)}
+
+/* コラム一覧のサムネ（参考サイトの「画像が並ぶ一覧」の型） */
+.artlist__items a{display:flex;align-items:center;gap:.95em}
+.artlist__img{width:6.4em;height:4.3em;object-fit:cover;border-radius:6px;flex:none;background:var(--washi-2)}
+.artlist__body{display:block;min-width:0}
+.ph--lead{margin:1.6rem 0 .4rem}
+.ph--lead img{border-radius:8px}
+
+/* 520px未満：ヘッダーを1段に収める（ロゴ縮小・メニューはアイコンのみ） */
+@media (max-width:519px){
+  .head__inner{flex-wrap:nowrap;gap:.55rem;padding-inline:.9rem}
+  .head__mark{width:36px;height:27px}
+  .head__name{font-size:.95rem;letter-spacing:.02em}
+  .head__right{gap:.45rem}
+  .head__cta{font-size:.74rem;padding:.6em .7em}
+  .head__menu-btn{font-size:0;gap:0;padding:.62rem .66rem}
+}
+
+/* 調査9社の一覧表 */
+.ctable--all th[scope=row]{font-weight:700;white-space:normal}
+.ctable--all td{font-size:.88rem}
+.allrank{display:inline-block;background:var(--ao);color:#fff;font-size:.7rem;font-weight:700;border-radius:4px;padding:.2em .5em;margin-right:.6em;vertical-align:.1em}
+
+/* ポータルホーム（2026-08-18新設） */
+.portal-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.8rem}
+.portal-actions .btn-main{flex:0 1 auto;min-width:14rem}
+.btn-main--ghost{background:#fff;color:var(--ao-deep);box-shadow:inset 0 0 0 2px var(--ao)}
+.btn-main--ghost::after{border-color:var(--ao-deep)}
+.btn-main--ghost:hover{background:var(--ao-pale);color:var(--ao-deep)}
+.portal-more{margin:1.4rem 0 0;text-align:right;font-size:.92rem;font-weight:700}
+.portal-pref{margin:.9rem 0 0;font-size:.92rem}
+
+/* この記事の要点（長文コラムの着地点。2026-08-18） */
+.matome{list-style:none;margin:0;padding:1.35rem 1.5rem;background:var(--ao-pale);border:1px solid rgba(0,108,195,.25);border-radius:8px;display:grid;gap:.75rem}
+.matome li{position:relative;padding-left:1.9em;font-size:.95rem;line-height:1.85;font-weight:500}
+.matome li::before{content:"";position:absolute;left:.15em;top:.55em;width:.85em;height:.45em;border-left:2.5px solid var(--ao);border-bottom:2.5px solid var(--ao);transform:rotate(-45deg)}
+
+/* TOPの1枚リンクカード（本文段落の直後に置く） */
+.artlist--solo{grid-template-columns:1fr;margin-top:1.1rem;margin-bottom:1.9rem;max-width:36rem}
+
+/* 発見からの時系列（TOP。2026-08-18ユーザー要望）
+   番号ノード＋縦の接続線。画像・アイコンは使わない（軽さと完成度の両立） */
+.tflow{list-style:none;margin:1.6rem 0 0;padding:0;counter-reset:flow}
+.tflow__step{position:relative;padding:0 0 1.9rem 3.4rem;counter-increment:flow}
+.tflow__step::before{content:counter(flow);position:absolute;left:0;top:-.1em;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--ao);color:#fff;font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.tflow__step::after{content:"";position:absolute;left:1.05rem;top:2.3rem;bottom:.3rem;width:2px;background:var(--ao-pale)}
+.tflow__step:last-child{padding-bottom:.2rem}
+.tflow__step:last-child::after{display:none}
+.tflow__t{font-weight:700;font-size:1.05rem;color:var(--sumi-deep);margin:0 0 .35em;line-height:1.7}
+.tflow__b{margin:0 0 .5em;font-size:.92rem;line-height:1.95;color:var(--haicha);max-width:44rem}
+.tflow__l{display:inline-flex;align-items:center;gap:.45em;font-size:.88rem;font-weight:700;color:var(--ao-deep);text-decoration:none;border-bottom:1.5px solid rgba(0,85,156,.35);padding-bottom:.1em}
+.tflow__l::after{content:"";width:.36em;height:.36em;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg)}
+.tflow__l:hover{color:var(--ao)}
+
+/* 「次に読むページ」の写真カード。TOPと同じ小サムネ（大きくしない） */
+.artlist--next{margin-top:1.2rem}
+
+/* 見出し横の飾りマークは廃止（簡易アイコン不使用の方針） */
+.secmark{display:none}
+
+/* 事業者一覧：比較ページに掲載中の会社を示すラベル */
+.card__ranked{display:inline-block;margin-left:.5em;font-size:.7rem;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--ao);border-radius:99px;padding:.3em .8em;white-space:nowrap}
+
+/* リード写真は高さを抑える（ページを取りすぎない。2026-08-18のユーザー指摘） */
+.ph--lead img{width:100%;height:clamp(150px,22vw,240px);object-fit:cover;border-radius:8px}
+
+/* 線画の人物イラスト（2026-08-18）。写真と競合させず、節の区切りに置く */
+.ill{margin:1.9rem auto;max-width:30rem;padding:0}
+.ill svg{display:block;width:100%;height:auto}
+@media (max-width:520px){.ill{max-width:22rem;margin:1.5rem auto}}
+
+/* 線画イラスト（イラストAC）。写真より軽い印象で、節の区切りに置く。
+   高さを抑えてページを取りすぎない（2026-08-18のユーザー指摘を踏襲） */
+.ill{margin:1.8rem auto;max-width:27rem}
+.ill img{display:block;width:100%;height:auto;max-height:230px;object-fit:contain}
+.ill--sm{max-width:19rem}
+@media (max-width:520px){.ill{max-width:20rem;margin:1.4rem auto}.ill img{max-height:180px}}
+
+/* CTA内のイラスト：濃紺の面に載るので白抜きの台を敷く */
+/* CTA内のイラスト：透過PNGなので台を敷かず、濃紺の面に直接置く。
+   線が濃紺だと沈むため、白のドロップシャドウで輪郭を起こす */
+.ill--cta{max-width:14rem;margin:0 auto 1rem;filter:drop-shadow(0 0 1px rgba(255,255,255,.9)) drop-shadow(0 0 6px rgba(255,255,255,.55))}
+.ill--cta img{max-height:120px}
+@media (max-width:520px){.ill--cta{max-width:11rem}.ill--cta img{max-height:95px}}
+
+/* 見出し＋イラストの横並び（LPの型。2026-08-18）
+   透過PNGなので背景に馴染む。スマホでは縦積みにして、見出しを先に読ませる */
+.hbi{display:grid;grid-template-columns:1fr;gap:1rem;align-items:center}
+@media (min-width:720px){
+  .hbi{grid-template-columns:1fr minmax(180px,260px);gap:2rem}
+  .hbi--rev .hbi__text{order:2}
+  .hbi--rev .hbi__ill{order:1}
+}
+.hbi__text .sec__h{margin-bottom:.7em}
+.hbi__ill{justify-self:center;width:100%;max-width:260px}
+.ill--bare{margin:0;max-width:100%}
+.ill--bare img{max-height:200px;object-fit:contain}
+@media (max-width:719px){.hbi__ill{max-width:200px}.ill--bare img{max-height:150px}}
+
+/* 淡い背景の帯（節の区切り。写真より軽い） */
+.band-soft{background:linear-gradient(180deg,var(--ao-pale),#fff);border-block:1px solid var(--rule-soft)}
+
+/* 早見表（冒頭の比較表）。本文より先に結論を出す */
+.quick{padding-top:1rem}
+.quick__note{margin-top:1rem;font-size:.9rem;color:var(--haicha);line-height:1.9}
+.quick__note a{font-weight:700}
+
+/* 相談先ハブ（/soudan/）。2026-08-18 追加。.artgroup__head を流用し、中身だけ専用。 */
+.soudan{list-style:none;margin:0;padding:0;display:grid;gap:.55rem}
+.soudan__i{background:var(--washi);border:1px solid var(--rule);border-radius:8px;padding:1.05rem 1.2rem}
+.soudan__t{margin:0 0 .4em;font-family:var(--sans);font-weight:700;font-size:.98rem;color:var(--sumi-deep);display:flex;align-items:baseline;gap:.7em;flex-wrap:wrap}
+.soudan__tel{font-size:1.02rem;letter-spacing:.04em;color:#fff;background:var(--ao-deep);border-radius:6px;padding:.2em .7em;line-height:1.5;white-space:nowrap}
+.soudan__b{margin:0;font-size:.87rem;line-height:1.95;color:var(--sumi-soft)}
+@media (min-width:760px){.soudan{grid-template-columns:1fr 1fr}}
+
+/* ASP案件ブロック（広告表記つき） */
+.asp .sec__h{display:flex;align-items:center;gap:.6em;flex-wrap:wrap}
+.asp__pr{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--haicha);border:1px solid var(--haicha);border-radius:2px;padding:.1em .5em;line-height:1.6}
+.asp__lead{font-size:.9rem;color:var(--haicha)}
+.asp__list{list-style:none;padding:0;margin:1em 0 0;display:grid;gap:.8em}
+.asp__item{border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:.9em 1.1em;background:#fff}
+.asp__name{margin:0 0 .3em;font-weight:600}
+.asp__name a{color:var(--ao);text-decoration:underline}
+.asp__kind{display:inline-block;margin-left:.7em;font-size:.8rem;font-weight:400;color:var(--haicha)}
+.asp__desc{margin:0;font-size:.92rem;line-height:1.8}
+.asp__px{position:absolute;width:1px;height:1px;opacity:0}
+
+/* 楽天（存命の方の片付けページのみ） */
+.rk .sec__h{display:flex;align-items:center;gap:.6em;flex-wrap:wrap}
+.rk__pr{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--haicha);border:1px solid var(--haicha);border-radius:2px;padding:.1em .5em;line-height:1.6}
+.rk__lead{font-size:.9rem;color:var(--haicha)}
+.rk__note{font-size:.9rem;margin:.6em 0 0}
+.rk__g{margin-top:1.4em}
+.rk__gh{margin:0 0 .5em;font-weight:600;font-size:.95rem}
+.rk__list{list-style:none;padding:0;margin:0;display:grid;gap:.6em}
+.rk__item{border:1px solid rgba(0,0,0,.08);border-radius:6px;padding:.75em 1em;background:#fff}
+.rk__item a{color:var(--ao);text-decoration:underline;font-weight:600}
+.rk__why{display:block;margin-top:.25em;font-size:.88rem;line-height:1.8;color:var(--sumi)}
+.rk__px{position:absolute;width:1px;height:1px;opacity:0}
