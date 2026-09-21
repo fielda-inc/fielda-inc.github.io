@@ -1,0 +1,24 @@
+# はじめての特殊清掃
+
+> 特殊清掃（孤独死・事故などの後の部屋の清掃・消臭）をはじめて頼む方のための案内所。愛知・岐阜・三重の91市町村と名古屋16区について、市区町村ごとの許可業者一覧・死亡届と火葬の窓口・ごみの実務・所轄警察署・相続放棄と相続登記と年金の手続き先を、自治体・県警・裁判所・法務局・日本年金機構の公式資料から転記しています。
+
+## 書き方の約束
+- 公的資料か各社公式サイトの記載だけを載せ、出典はすべて取得日つきで各ページ末尾に置いています（1,500件超）。
+- 「相場は◯円」と断定しません。料金表を公開している22社の金額の帯（1R・1Kで5万〜15万円、戸建てで25万〜60万円。下限は3万〜25万円まで開く）を示しています。
+- 掲載順は当サイトの基準によるもので、報酬額では変わりません。星は施工品質の測定値ではありません。
+- 掲載社の電話番号は載せていません。相談は各社の公式サイトか当サイトの相談フォームへ。
+
+## 入口
+- 発見された直後にすること: https://hajimete-tokusyuseisou.com/situation/hakken/
+- 鍵が戻ってからの順番: https://hajimete-tokusyuseisou.com/situation/kodokushi/
+- 費用の帯と見積の検算: https://hajimete-tokusyuseisou.com/situation/hiyou/
+- 地域から探す（市区町村の一覧）: https://hajimete-tokusyuseisou.com/area/
+- 愛知県: https://hajimete-tokusyuseisou.com/aichi/　岐阜県: https://hajimete-tokusyuseisou.com/gifu-ken/　三重県: https://hajimete-tokusyuseisou.com/mie-ken/
+- 掲載と順位の基準: https://hajimete-tokusyuseisou.com/kijun/
+- 運営者: https://hajimete-tokusyuseisou.com/operator/
+- コラム（出典つき）: https://hajimete-tokusyuseisou.com/column/
+- サイトマップ: https://hajimete-tokusyuseisou.com/sitemap.xml
+
+## 運営
+- 株式会社Fielda（代表者：水野 大誠）（〒460-0007 愛知県名古屋市中区新栄2-4-5 東和パークビル西館301号）
+- 連絡先: info@hajimete-tokusyuseisou.com
