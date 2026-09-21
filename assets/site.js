@@ -56,7 +56,7 @@
     // 業者の公式サイトへの外部クリック。どの業者へ何件送ったかが営業の証拠になる（§9）
     var company = a.getAttribute('data-company');
     if (company) {
-      track('outbound_company', { company: company, location: location.pathname, link_url: a.href });
+      track('outbound_company', { company: company, location: location.pathname, link_url: a.href, placement: a.getAttribute('data-cta') || 'content' });
       return;
     }
     if (a.hostname && a.hostname !== location.hostname) {
