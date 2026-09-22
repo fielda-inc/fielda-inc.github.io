@@ -2009,8 +2009,10 @@ table.rtable{width:100%;min-width:0;table-layout:fixed;font-size:.875rem;margin:
 .select-hero__offer-copy>small{display:block;font-size:.67rem;line-height:1.7;margin-top:.45rem;color:#62727a}
 .select-hero__action>small{display:block;font-size:.68rem;text-align:center;color:#536871;margin-top:.45rem}
 .rank-basics{padding-block:2.3rem 2.6rem}
+.rank-basics__overview{display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;margin-bottom:1.4rem}
+.rank-basics__image,.rank-wait__image{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain;border-radius:5px}
 .rank-basics h2{font-size:clamp(1.35rem,2.2vw,1.8rem);margin-bottom:.9rem}
-.rank-basics__lead{font-size:.91rem;line-height:1.9;max-width:54rem;margin-bottom:1.3rem}
+.rank-basics__lead{font-size:.91rem;line-height:1.9;max-width:54rem;margin-bottom:0}
 .rank-basics__services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:1px;background:#d8e6ec;border:1px solid #d8e6ec}
 .rank-basics__services>div{background:#f2f8fb;padding:1.15rem 1.3rem}
 .rank-basics__services dt{color:#236d90;font-size:1rem;font-weight:700;margin-bottom:.4rem}
@@ -2024,16 +2026,19 @@ table.rtable{width:100%;min-width:0;table-layout:fixed;font-size:.875rem;margin:
 .rank-precautions{padding-block:2.5rem 2.8rem}
 .rank-precautions__lead,.rank-wait__lead{text-align:center;font-size:.9rem;line-height:1.9;margin:0 0 1.6rem}
 .rank-precautions__list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;list-style:none;margin:0;padding:0}
-.rank-precautions__list>li{border:1px solid #dbe5ea;border-radius:7px;padding:1.35rem;margin:0;display:flex;flex-direction:column;background:white}
-.rank-precautions__number{font-size:2.3rem;line-height:1;color:#537e91;letter-spacing:.02em;margin-bottom:1rem}
-.rank-precautions__list>li>div{display:flex;flex-direction:column;flex:1}
-.rank-precautions__list h3{font-size:1.04rem;line-height:1.75;margin-bottom:.75rem}
-.rank-precautions__list p{font-size:.82rem;line-height:1.9;margin:0 0 1rem}
+.rank-precautions__list>li{border:1px solid #dbe5ea;border-radius:7px;padding:1rem;margin:0;display:grid;grid-template-rows:auto auto 1fr auto;gap:.85rem;background:white}
+.rank-precautions__image{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain;border-radius:3px}
+.rank-precautions__heading{display:flex;gap:.65rem;align-items:baseline}
+.rank-precautions__number{font-size:1.05rem;line-height:1;color:#537e91;letter-spacing:.02em;flex-shrink:0}
+.rank-precautions__list h3{font-size:1.04rem;line-height:1.75;margin:0}
+.rank-precautions__list p{font-size:.82rem;line-height:1.9;margin:0}
 .rank-precautions__point{display:block;margin-top:auto;padding:.65rem .25rem;background:#eef6f9;color:#366d84;text-align:center;font-size:.76rem;line-height:1.7}
 .rank-wait{background:#f1f8fa;padding-block:2.8rem;margin-bottom:1rem}
-.rank-wait__risks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem;margin:0}
-.rank-wait__risks>div{padding-top:.8rem;border-top:2px solid #a8c9d5}
-.rank-wait__risks dt{font-size:1rem;font-weight:700;color:#236d90;margin-bottom:.45rem}
+.rank-wait__overview{display:grid;grid-template-columns:1fr 1.4fr;gap:2rem;align-items:center}
+.rank-wait__lead{text-align:left;margin-bottom:1rem}
+.rank-wait__risks{display:grid;grid-template-columns:1fr;gap:.8rem;margin:0}
+.rank-wait__risks>div{display:grid;grid-template-columns:5.5rem 1fr;gap:.8rem;padding-top:.8rem;border-top:1px solid #c5dce5}
+.rank-wait__risks dt{font-size:.86rem;font-weight:700;color:#236d90;margin:0}
 .rank-wait__risks dd{font-size:.83rem;line-height:1.9;margin:0}
 .rank-wait__next{display:grid;grid-template-columns:1fr 1fr;gap:2rem;background:white;padding:1.5rem;margin-top:1.5rem;align-items:center;border:1px solid #dbe8ed;border-radius:7px}
 .rank-wait__next h3{font-size:1.12rem;line-height:1.65;margin-bottom:.6rem}
@@ -2041,16 +2046,23 @@ table.rtable{width:100%;min-width:0;table-layout:fixed;font-size:.875rem;margin:
 .rank-wait__next .focus-button{margin-top:0}
 .rank-wait__next .focus-action-note{margin-bottom:0}
 @media(max-width:760px){
+  .rank-basics__overview{gap:1.2rem;grid-template-columns:1.4fr 1fr}
   .rank-basics__difference{grid-template-columns:1fr;gap:.6rem}
   .rank-precautions__list{grid-template-columns:1fr;gap:.75rem}
-  .rank-precautions__list>li{display:grid;grid-template-columns:2.6rem 1fr;gap:1rem;padding:1.2rem}
-  .rank-precautions__number{font-size:1.8rem;margin-top:.2rem}
+  .rank-precautions__list>li{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);grid-template-rows:auto auto auto;gap:.85rem 1rem;padding:1rem}
+  .rank-precautions__heading{display:block;align-self:center}
+  .rank-precautions__number{display:block;margin-bottom:.35rem}
+  .rank-precautions__list p,.rank-precautions__point{grid-column:1/-1}
   .rank-precautions__list h3 br{display:none}
   .rank-precautions__point{text-align:left;padding:.5rem .8rem}
+  .rank-wait__overview{grid-template-columns:1fr;gap:1.4rem}
+  .rank-wait__image{max-width:440px;margin-inline:auto}
   .rank-wait__next{grid-template-columns:1fr;gap:1rem}
 }
 @media(max-width:560px){
   .rank-basics{padding-block:1.8rem}
+  .rank-basics__overview{grid-template-columns:1fr;gap:1rem}
+  .rank-basics__image{width:min(100%,330px);margin-inline:auto}
   .rank-basics .focus-eyebrow{font-size:.7rem}
   .rank-basics h2{font-size:1.3rem}
   .rank-basics__lead{font-size:.86rem}
@@ -2064,9 +2076,9 @@ table.rtable{width:100%;min-width:0;table-layout:fixed;font-size:.875rem;margin:
   .rank-precautions{padding-block:2rem}
   .rank-precautions__lead,.rank-wait__lead{text-align:left;font-size:.85rem}
   .rank-precautions__lead br,.rank-wait__lead br{display:none}
-  .rank-precautions__list>li{grid-template-columns:1.9rem 1fr;gap:.8rem;padding:1rem}
-  .rank-precautions__number{font-size:1.45rem}
-  .rank-precautions__list h3{font-size:1rem;line-height:1.7}
+  .rank-precautions__list>li{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:.8rem;padding:.85rem}
+  .rank-precautions__number{font-size:.88rem}
+  .rank-precautions__list h3{font-size:.92rem;line-height:1.6}
   .rank-precautions__list p{font-size:.82rem}
   .rank-precautions__point{font-size:.75rem}
   .rank-wait{padding-block:2rem}
