@@ -64,43 +64,6 @@
     }
   });
 
-  // 比較の切替。JSが使えないときは、すべての表をそのまま読める。
-  document.querySelectorAll('[data-comparison]').forEach(function (root) {
-    var nav = root.querySelector('.select-compare__tabs');
-    var tabs = Array.from(root.querySelectorAll('[data-compare-tab]'));
-    var panels = Array.from(root.querySelectorAll('[data-compare-panel]'));
-    if (!nav || !tabs.length) return;
-    function select(index, moveFocus) {
-      tabs.forEach(function (tab, i) {
-        tab.setAttribute('aria-selected', String(i === index));
-        tab.tabIndex = i === index ? 0 : -1;
-        panels[i].hidden = i !== index;
-      });
-      if (moveFocus) tabs[index].focus();
-    }
-    nav.hidden = false;
-    nav.setAttribute('role', 'tablist');
-    tabs.forEach(function (tab, i) {
-      tab.setAttribute('role', 'tab');
-      panels[i].setAttribute('role', 'tabpanel');
-      panels[i].setAttribute('aria-labelledby', tab.id);
-      panels[i].tabIndex = 0;
-      tab.addEventListener('click', function () {
-        select(i, false);
-        track('comparison_view', { view: tab.getAttribute('data-compare-tab'), location: location.pathname });
-      });
-      tab.addEventListener('keydown', function (event) {
-        var next = event.key === 'ArrowRight' ? (i + 1) % tabs.length
-          : event.key === 'ArrowLeft' ? (i + tabs.length - 1) % tabs.length
-          : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : -1;
-        if (next < 0) return;
-        event.preventDefault();
-        select(next, true);
-      });
-    });
-    select(0, false);
-  });
-
   // スクロールの到達率。GA4の拡張計測は90%到達しか送らず、当サイトは1ページが長いので届かない。
   var marks = [25, 50, 75];
   var sent = {};
