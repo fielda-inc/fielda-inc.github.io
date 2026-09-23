@@ -1,0 +1,30 @@
+/* Shared action styling: the site's blue, white fill, and capsule shape. */
+body.home--focus,
+body.ranking-page--focus,
+body.ranking-page--select {
+  --focus-accent: var(--ao);
+  --focus-accent-hover: var(--ao-deep);
+}
+
+:root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel) {
+  background: #fff;
+  color: var(--ao);
+  border: 2px solid var(--ao);
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+:root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel):hover {
+  background: var(--ao-pale);
+  color: var(--ao-deep);
+  border-color: var(--ao-deep);
+  box-shadow: none;
+  transform: none;
+}
+
+:root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel):focus-visible {
+  outline: 3px solid var(--ao);
+  outline-offset: 4px;
+}
+
+body.ranking-page--select mark { background: linear-gradient(transparent 65%, #dceefb 65%); }
