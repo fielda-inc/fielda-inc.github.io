@@ -21,7 +21,7 @@
 
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/biz-udpgothic-japanese-400-normal.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/zen-old-mincho-japanese-600-normal.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/style.css?v=20260923-ranking-art-hero">
 
 <link rel="stylesheet" href="/assets/controls.css?v=20260923-blue-pill">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -36,7 +36,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CD8SJFFCGS"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-CD8SJFFCGS');</script>
 </head>
-<body class="ranking-page">
+<body class="ranking-page ranking-page--art-hero">
 <a class="skip" href="#main">本文へ移動</a>
 
 <header class="head">
@@ -45,7 +45,7 @@
 <img class="head__mark" src="/assets/logo-mark.png" alt="" width="45" height="34">
 <span class="head__names"><span class="head__name">はじめての特殊清掃</span><span class="head__tag">亡くなった後の部屋を、最初に任せる一社を。</span></span>
 </a>
-<div class="head__right"><a class="head__cta" href="/contact/" data-ga="form_open">相談フォーム</a>
+<div class="head__right"><a class="head__cta" href="#s-rank">ランキングを見る</a>
 <details class="head__menu">
 <summary class="head__menu-btn" aria-label="メニューを開く"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>メニュー</summary>
 <nav class="head__nav" aria-label="主要メニュー">
@@ -54,7 +54,7 @@
 <a href="/area/">地域から探す</a>
 <a href="/column/">コラム</a>
 <a href="/soudan/">困ったときの相談先</a>
-<a href="/contact/" data-ga="form_open">相談フォーム</a>
+<a href="#s-rank">おすすめの業者</a>
 </nav>
 </details></div>
 </div>
@@ -64,15 +64,21 @@
 </ol></nav>
 <main id="main">
 
-<section class="hero hero--ranking wrap-a">
-<h1 class="hero__h">岐阜県の特殊清掃業者<br>おすすめランキングTOP5</h1>
+<section class="ranking-art-hero" aria-label="岐阜県の特殊清掃業者比較">
+<div class="wrap ranking-art-hero__disclosure"><p class="prline" data-prline>本サイトはアフィリエイト広告を利用しています。掲載順は当サイトの基準で決めており、報酬額では変わりません。</p></div>
+<div class="ranking-art-hero__canvas">
+<h1 class="ranking-art-hero__name" style="--region-desktop:5.85cqw;--region-mobile:10.80cqw"><span>岐阜県</span><small>の</small><span class="u-sr">特殊清掃ランキング</span></h1>
+<picture><source media="(max-width: 767px)" srcset="/assets/ranking-hero/region-mobile-20260923.webp" width="1024" height="1536"><img src="/assets/ranking-hero/region-desktop-20260923.webp" width="1672" height="941" alt="比較で見つかる、安心の一社。対応範囲・料金・信頼性をもとに特殊清掃業者を比較。" loading="eager" fetchpriority="high" decoding="async"></picture>
+</div>
+<div class="wrap-a">
 <p class="hero__summary">岐阜県への対応を公式サイトに明記している5社を、同じ基準で比べました。</p>
 <p class="byline"><span class="byline__date">最終更新：2026-09-23</span><span class="byline__by">はじめての特殊清掃 編集部</span><span class="byline__survey">業者調査：2026年9月</span></p>
 <nav class="hero-shortcuts" aria-label="読みたい内容へ"><a href="#c-clean-estate">1位の詳細</a><a href="#s-rank">5社を比較</a><a href="#s-coverage">対応地域</a></nav>
+</div>
 </section>
 
 <section class="ranking-list wrap-a" id="s-rank" aria-label="おすすめの特殊清掃業者5社">
-<div class="ranking-list__intro"><p class="prline" data-prline>本サイトはアフィリエイト広告を利用しています。掲載順は当サイトの基準で決めており、報酬額では変わりません。</p><a href="/kijun/">掲載・評価の基準</a></div>
+<div class="ranking-list__intro"><a href="/kijun/">掲載・評価の基準</a></div>
 <div class="ranking-list__cards"><section class="rank-panel rank-panel--top" id="c-clean-estate"><div class="rank-company-head">
 <div class="rank-company-head__meta"><span class="rank-position">1位</span><span class="rank-choice">編集部のおすすめ</span><span class="rank-rating"><span class="stars stars--sm" role="img" aria-label="5点満点中 4.8点">
 <span class="stars__track">★★★★★<span class="stars__fill" style="width:96%">★★★★★</span></span>
@@ -366,7 +372,7 @@
 <li><a href="/changelog/">更新履歴</a></li>
 <li><a href="/operator/">運営者情報</a></li>
 <li><a href="/privacy/">プライバシーポリシー</a></li>
-<li><a href="/contact/" data-ga="form_open">お問い合わせ</a></li>
+<li><a href="/contact/" data-ga="form_open">掲載情報へのお問い合わせ</a></li>
 </ul></div>
 </nav>
 </div>
@@ -374,8 +380,8 @@
 <p class="foot__copy">© はじめての特殊清掃</p>
 </footer>
 <div class="sticky" role="complementary" aria-label="相談の導線">
-<div class="sticky__inner"><a class="sticky__form" href="/contact/" data-ga="form_open">相談フォーム</a></div>
+<div class="sticky__inner"><a class="sticky__form sticky__company" href="https://clean-estate.co.jp/#contact" rel="nofollow noopener" target="_blank" data-company="clean-estate" data-cta="sticky">クリーンエステートに問い合わせる<span>現地確認・出張見積無料 · 公式サイトへ</span></a></div>
 </div>
-<script src="/assets/site.js" defer></script>
+<script src="/assets/site.js?v=20260922-comparison-overview" defer></script>
 </body>
 </html>

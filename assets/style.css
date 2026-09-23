@@ -2356,3 +2356,25 @@ table.rtable{width:100%;min-width:0;table-layout:fixed;font-size:.875rem;margin:
   .area-region[open] .area-region__toggle{transform:rotate(225deg);margin-top:8px}
   .area-region[open]>summary{padding-bottom:9px;margin-bottom:3px;border-bottom:1px solid #e8efed}
 }
+
+/* 2026-09-23：支給FV。愛知は原稿のまま、ほかの地域は地名だけを実テキストで表示。 */
+.ranking-art-hero{padding:0 0 1.5rem;background:#fff}
+.ranking-art-hero__disclosure .prline{margin:0;padding:.55rem 0;font-size:.68rem}
+.ranking-art-hero__canvas{position:relative;container-type:inline-size;width:100%;max-width:1672px;margin-inline:auto}
+.ranking-art-hero__canvas picture,.ranking-art-hero__canvas img{display:block;width:100%}
+.ranking-art-hero__canvas img{height:auto;aspect-ratio:1672/941}
+.ranking-page .ranking-art-hero__name{position:absolute;z-index:1;top:23.5%;left:5%;width:47%;margin:0;display:flex;align-items:baseline;gap:0;white-space:nowrap;font-family:var(--serif);font-weight:600;font-size:var(--region-desktop,5.85cqw);line-height:1;letter-spacing:0;color:#082d50}
+.ranking-art-hero__name>span:not(.u-sr){background:linear-gradient(180deg,#082e50 16%,#153d65 45%,#367dbc 89%);background-clip:text;-webkit-background-clip:text;color:transparent}
+.ranking-art-hero__name small{font-size:.7em;font-weight:inherit;margin-left:.08em;color:#082d50}
+.ranking-art-hero .select-hero__offer{margin-top:1.1rem}
+@media(max-width:767px){
+ .ranking-art-hero{padding-bottom:1rem}
+ .ranking-page--art-hero .head__cta{display:none}
+  .ranking-art-hero__disclosure .prline{font-size:.6rem;line-height:1.6;padding:.4rem 0}
+  .ranking-art-hero__canvas img{aspect-ratio:2/3}
+ .ranking-page .ranking-art-hero__name{top:6.3%;left:5%;width:90%;justify-content:center;font-size:var(--region-mobile,10.8cqw)}
+  .ranking-art-hero .select-hero__offer{grid-template-columns:1fr;margin-top:.75rem;padding:1rem;gap:.8rem}
+  .ranking-art-hero .select-hero__offer-copy>strong{font-size:.96rem}
+  .ranking-art-hero .select-hero__offer-copy>small{font-size:.67rem}
+  .ranking-art-hero .select-hero__action{width:100%;max-width:34rem;margin-inline:auto}
+}
