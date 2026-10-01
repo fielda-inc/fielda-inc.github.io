@@ -52,6 +52,10 @@
     var ga = a.getAttribute('data-ga');
     if (ga === 'tel_tap') { track('tel_tap', { location: location.pathname }); return; }
     if (ga === 'form_open') { track('form_open', { location: location.pathname }); return; }
+    if (ga === 'regional_ranking_click') {
+      track('regional_ranking_click', { location: location.pathname, link_url: a.href, placement: a.getAttribute('data-cta') || 'content' });
+      return;
+    }
 
     // 業者の公式サイトへの外部クリック。どの業者へ何件送ったかが営業の証拠になる（§9）
     var company = a.getAttribute('data-company');

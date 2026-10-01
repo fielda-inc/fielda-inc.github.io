@@ -2357,7 +2357,7 @@ table.rtable{width:100%;min-width:0;table-layout:fixed;font-size:.875rem;margin:
   .area-region[open]>summary{padding-bottom:9px;margin-bottom:3px;border-bottom:1px solid #e8efed}
 }
 
-/* 2026-09-23：支給FV。愛知は原稿のまま、ほかの地域は地名だけを実テキストで表示。 */
+/* 支給FVの構図を維持。2026-09-24：全地域でイラスト背景と実テキストの地名を使用。 */
 .ranking-art-hero{padding:0 0 1.5rem;background:#fff}
 .ranking-art-hero__disclosure .prline{margin:0;padding:.55rem 0;font-size:.68rem}
 .ranking-art-hero__canvas{position:relative;container-type:inline-size;width:100%;max-width:1672px;margin-inline:auto}

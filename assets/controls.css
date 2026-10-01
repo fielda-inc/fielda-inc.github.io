@@ -11,20 +11,73 @@ body.ranking-page--select {
   color: var(--ao);
   border: 2px solid var(--ao);
   border-radius: 999px;
-  box-shadow: none;
+  box-shadow: 0 4px 0 #b9d8ec;
+  cursor: pointer;
+  transition: background-color .15s, border-color .15s, box-shadow .15s, transform .15s;
 }
 
 :root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel):hover {
   background: var(--ao-pale);
   color: var(--ao-deep);
   border-color: var(--ao-deep);
-  box-shadow: none;
-  transform: none;
+  box-shadow: 0 5px 0 #a8cde5;
+  transform: translateY(-1px);
+}
+
+:root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel):active {
+  box-shadow: 0 1px 0 #b9d8ec;
+  transform: translateY(3px);
 }
 
 :root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel):focus-visible {
   outline: 3px solid var(--ao);
   outline-offset: 4px;
+}
+
+/* A distinct action arrow and room for long company names on narrow screens. */
+:root body :is(.focus-button, .btn-main:not(.btn-main--cell), .sticky__form) {
+  position: relative;
+  min-height: 54px;
+  padding-inline: 2.8rem;
+}
+:root body :is(.focus-button, .btn-main:not(.btn-main--cell), .sticky__form)::after {
+  content: '›';
+  display: grid;
+  place-items: center;
+  position: absolute;
+  right: .8rem;
+  top: 50%;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ao);
+  color: #fff;
+  font: 700 1.4rem/1 Arial, sans-serif;
+  transform: translateY(-50%);
+}
+:root body .home-action>span[aria-hidden] {
+  display: grid;
+  place-items: center;
+  flex: 0 0 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--ao);
+  color: #fff;
+  font-size: 1rem;
+}
+:root body .btn-submit:disabled {
+  cursor: wait;
+  box-shadow: none;
+  transform: none;
+}
+@media(max-width:540px) {
+  :root body :is(.focus-button, .btn-main:not(.btn-main--cell), .sticky__form) { padding-inline: 2.2rem; }
+  :root body :is(.focus-button, .btn-main:not(.btn-main--cell), .sticky__form)::after { right: .6rem; width: 1.4rem; height: 1.4rem; font-size: 1.25rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  :root body :is(.home-action, .focus-button, .btn-main, .btn-sub, .btn-line, .btn-submit, .head__cta, .head__menu-btn, .sticky__form, .sticky__tel) { transition: none; }
 }
 
 body.ranking-page--select mark { background: linear-gradient(transparent 65%, #dceefb 65%); }
