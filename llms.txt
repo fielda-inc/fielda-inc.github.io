@@ -20,5 +20,5 @@
 - サイトマップ: https://hajimete-tokusyuseisou.com/sitemap.xml
 
 ## 運営
-- 株式会社Fielda（代表者：水野 大誠）（〒460-0007 愛知県名古屋市中区新栄2-4-5 東和パークビル西館301号）
+- 株式会社Fielda（〒460-0007 愛知県名古屋市中区新栄2-4-5 東和パークビル西館301号）
 - 連絡先: info@hajimete-tokusyuseisou.com
