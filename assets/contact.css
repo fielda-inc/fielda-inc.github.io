@@ -1,0 +1,56 @@
+/* 相談フォーム（2026-11-08）
+   迷わず送れるよう、1 困りごと → 2 お返事の宛先 → 3 確認して送る の3段にした。
+   番号と縦線で「あと何をすれば送れるか」が一目で分かるようにする。 */
+
+.contact-hero__in{margin-top:clamp(1.6rem,4vw,2.4rem);max-width:44rem}
+.contact-hero .contact-hero__h{font-size:clamp(1.5rem,3.6vw,2.3rem)}
+.contact-hero .hero__lead b{color:var(--ao-deep)}
+
+/* 送る前の不安を3つだけ先に消す。 */
+.contact-points{list-style:none;padding:0;margin:1.3rem 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;max-width:40rem}
+.contact-points li{display:flex;flex-direction:column;gap:.15rem;text-align:center;border:1px solid #cfe0ef;background:var(--ao-pale);border-radius:10px;padding:.8rem .6rem}
+.contact-points b{font-family:var(--sans);font-size:1.05rem;line-height:1.45;color:var(--ao-deep)}
+.contact-points span{font-size:.74rem;line-height:1.6;color:var(--haicha)}
+
+.contact-sec{padding-top:0}
+.contact-form{max-width:40rem;margin-top:.6rem}
+
+/* 手順の番号と、次の段へつながる縦線 */
+.contact-step{position:relative;display:grid;grid-template-columns:2.4rem minmax(0,1fr);column-gap:.9rem;padding-bottom:.4rem}
+.contact-step::before{content:"";position:absolute;left:calc(1.2rem - 1px);top:2.7rem;bottom:.2rem;width:2px;background:#d3e3f1}
+.contact-step--send::before{display:none}
+.contact-step__no{position:relative;z-index:1;margin:0;width:2.4rem;height:2.4rem;border-radius:50%;display:grid;place-items:center;background:var(--ao);color:#fff;font-family:var(--sans);font-weight:700;font-size:1.05rem}
+.contact-form .contact-step__h{font-family:var(--sans);font-size:1.05rem;font-weight:700;line-height:1.6;color:var(--sumi-deep);margin:.38rem 0 .8rem}
+
+/* 困りごとは、押すだけで選べる札にする。 */
+.contact-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+.contact-chips label{display:flex;align-items:center;gap:.55em;min-height:3rem;padding:.6em .85em;border:1.5px solid var(--rule);border-radius:10px;background:#fff;font-size:.86rem;line-height:1.55;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+.contact-chips input{flex:none;width:1.05rem;height:1.05rem;margin:0;accent-color:var(--ao)}
+.contact-chips label:has(input:checked){border-color:var(--ao);background:var(--ao-pale);color:var(--ao-deep);font-weight:700}
+.contact-chips label:has(input:focus-visible){outline:2px solid var(--ao);outline-offset:2px}
+
+.contact-form textarea{min-height:6.5em}
+.contact-form .field{margin-bottom:1.15rem}
+.contact-form fieldset.field{margin-bottom:1.15rem}
+
+/* 任意の欄は畳んで、手順の右側にそろえる。 */
+.contact-more{margin:0 0 1.2rem calc(2.4rem + .9rem)}
+
+/* 送信はこのページの終点。サイト共通の白い枠ボタン（controls.css）ではなく、
+   トップの主ボタンと同じ青い塗りにする。 */
+:root body .contact-form .contact-submit{width:100%;min-height:3.6rem;padding:.9em 1em;border:0;border-radius:999px;background:var(--ao);color:#fff;font-family:var(--sans);font-weight:700;font-size:1.1rem;letter-spacing:.06em;box-shadow:0 4px 0 #00467f}
+:root body .contact-form .contact-submit:hover{background:var(--ao-deep);color:#fff;box-shadow:0 5px 0 #00467f}
+:root body .contact-form .contact-submit:disabled{background:var(--ao-deep);color:#fff;box-shadow:none}
+
+@media (max-width:460px){
+  .contact-points{grid-template-columns:1fr;gap:.4rem}
+  .contact-points li{flex-direction:row;align-items:baseline;gap:.8rem;text-align:left;padding:.45rem .85rem}
+  .contact-points b{flex:none;min-width:7.6em;font-size:.95rem}
+  .contact-step{grid-template-columns:2rem minmax(0,1fr);column-gap:.7rem}
+  .contact-step::before{left:calc(1rem - 1px);top:2.3rem}
+  .contact-step__no{width:2rem;height:2rem;font-size:.95rem}
+  .contact-form .contact-step__h{margin-top:.2rem}
+  .contact-chips{grid-template-columns:1fr;gap:.4rem}
+  .contact-chips label{min-height:2.8rem}
+  .contact-more{margin-left:calc(2rem + .7rem)}
+}
