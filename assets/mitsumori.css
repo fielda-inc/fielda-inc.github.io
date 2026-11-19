@@ -1,0 +1,70 @@
+/* かんたん費用チェック（2026-11-15） */
+.mitsu-page{--m-navy:#1f4f7a;--m-blue:#2879b3;--m-sky:#dcedf9;--m-text:#354c55}
+.mitsu [hidden]{display:none!important}
+.mitsu-hero{padding-top:1.6rem;text-align:center}
+.mitsu-hero .prline{text-align:left}
+.mitsu-hero__eyebrow{display:inline-block;margin:1.2rem 0 .5rem;padding:.25em 1em;border-radius:999px;background:var(--m-navy);color:#fff;font-size:.9rem;font-weight:700;letter-spacing:.06em}
+.mitsu-hero h1{margin:0 0 1rem;font-size:clamp(1.7rem,5vw,2.5rem);line-height:1.4;letter-spacing:.04em;color:var(--m-text)}
+.mitsu-points{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:0 0 1.4rem;padding:0}
+.mitsu-points li{display:flex;align-items:center;justify-content:center;min-height:3.4rem;margin:0;padding:.5rem .6rem;background:#fff;border:1px solid #c9deef;border-radius:8px;line-height:1.45}
+.mitsu-points strong{font-size:.95rem;color:var(--m-blue)}
+.mitsu{margin:0 0 3rem;padding:1.2rem 1.2rem 1.6rem;background:var(--m-sky);border-radius:16px}
+.mitsu-progress{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.3rem;margin:0 0 1.4rem;padding:0}
+.mitsu-progress li{display:flex;flex-direction:column;align-items:center;gap:.25rem;margin:0;font-size:.74rem;font-weight:700;color:#6a8496;line-height:1.3;text-align:center}
+.mitsu-progress span{display:grid;place-items:center;width:1.9rem;height:1.9rem;border-radius:50%;background:#fff;border:2px solid #b9d2e4;font-size:.9rem;color:#6a8496}
+.mitsu-progress .is-done span{background:var(--m-blue);border-color:var(--m-blue);color:#fff}
+.mitsu-progress .is-now{color:var(--m-navy)}
+.mitsu-progress .is-now span{background:#fff;border-color:var(--m-navy);color:var(--m-navy);box-shadow:0 0 0 4px rgba(31,79,122,.16)}
+.mitsu-step,.mitsu-result{margin-top:1.1rem}
+.mitsu-q{display:flex;align-items:flex-start;gap:.6rem}
+.mitsu-avatar{flex:none;display:grid;place-items:center;width:2.9rem;height:2.9rem;border-radius:50%;background:#fff;border:2px solid #b9d2e4}
+.mitsu-avatar img{width:1.9rem;height:auto;display:block}
+.mitsu-q p{position:relative;margin:0;padding:.8rem 1.1rem;background:#fff;border-radius:4px 18px 18px 18px;font-size:1.08rem;font-weight:700;line-height:1.6;color:var(--m-text);box-shadow:0 3px 0 #c5dbea}
+.mitsu-q p b{color:#c8642a;font-weight:700}
+.mitsu-opts{display:flex;flex-wrap:wrap;gap:.6rem;margin:.9rem 0 0 3.5rem}
+.mitsu-opts button{min-height:3rem;padding:.55rem 1.3rem;background:#fff;border:2px solid var(--m-navy);border-radius:999px;color:var(--m-navy);font:inherit;font-size:1rem;font-weight:700;line-height:1.4;cursor:pointer;box-shadow:0 3px 0 #b4cde0;transition:background .15s,transform .15s,box-shadow .15s}
+.mitsu-opts button:hover{background:#eef6fc}
+.mitsu-opts button:active{transform:translateY(3px);box-shadow:none}
+.mitsu-opts button:focus-visible,.mitsu-back:focus-visible{outline:3px solid var(--m-blue);outline-offset:3px}
+.mitsu-a{display:flex;align-items:center;justify-content:flex-end;gap:.7rem;margin-top:.8rem}
+.mitsu-a p{margin:0;padding:.7rem 1.2rem;background:var(--m-navy);border-radius:18px 4px 18px 18px;color:#fff;font-size:1.02rem;font-weight:700;line-height:1.5}
+.mitsu-back{padding:.35rem .2rem;background:none;border:0;color:var(--m-navy);font:inherit;font-size:.82rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:2.6rem}
+.mitsu-band{margin:1rem 0 0;padding:1.3rem 1.2rem 1.2rem;background:#fff;border:2px solid var(--m-navy);border-radius:14px;text-align:center}
+.mitsu-band__label{margin:0;font-size:.98rem;font-weight:700;color:var(--m-blue)}
+.mitsu-band__value{margin:.2rem 0 .6rem;font-size:clamp(2.1rem,9vw,3.2rem);font-weight:700;line-height:1.25;color:var(--m-navy);letter-spacing:.02em}
+.mitsu-band__note{margin:0;font-size:.88rem;line-height:1.75;color:var(--m-text);text-align:left}
+.mitsu-band__warn{margin:.7rem 0 0;padding:.7rem .9rem;background:#fff6e5;border-left:4px solid #e0a52b;border-radius:0 6px 6px 0;font-size:.88rem;line-height:1.7;text-align:left}
+.mitsu-band__more{display:inline-block;margin-top:.8rem;font-size:.88rem;font-weight:700;color:var(--m-blue);text-underline-offset:4px}
+.mitsu-band__more::after{content:" →"}
+.mitsu-form{margin:1.2rem 0 0;padding:1.4rem 1.2rem 1.2rem;background:var(--m-navy);border-radius:14px;color:#fff}
+.mitsu-form h2{margin:0 0 .5rem;padding:0;border:0;background:none;font-size:1.3rem;line-height:1.5;color:#fff;text-align:center}
+.mitsu-form__lead{margin:0 0 1rem;font-size:.95rem;line-height:1.7;text-align:center}
+.mitsu-form__label{display:block;margin:0 0 .4rem;font-size:.95rem;font-weight:700}
+.mitsu-form__tel{display:block;width:100%;box-sizing:border-box;min-height:3.6rem;padding:.6rem 1rem;border:2px solid #fff;border-radius:10px;background:#fff;color:#1c2733;font:inherit;font-size:1.35rem;font-weight:700;letter-spacing:.04em}
+.mitsu-form__tel::placeholder{color:#8a99a5;font-weight:400;font-size:1.05rem;letter-spacing:0}
+.mitsu-form__tel:focus-visible{outline:4px solid #ffd66b;outline-offset:2px}
+.mitsu-form__consent{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.6rem;align-items:start;margin:1rem 0;font-size:.86rem;line-height:1.7}
+.mitsu-form__consent input{width:1.4rem;height:1.4rem;margin:.15rem 0 0}
+.mitsu-form__consent a{color:#fff}
+.mitsu-form__submit{display:block;width:100%;min-height:3.8rem;padding:.6rem 1rem;background:#d9455d;border:0;border-radius:10px;color:#fff;font:inherit;font-size:1.25rem;font-weight:700;letter-spacing:.05em;cursor:pointer;box-shadow:0 4px 0 #a92c43}
+.mitsu-form__submit:hover{background:#cf3a53}
+.mitsu-form__submit:disabled{opacity:.7;cursor:default}
+.mitsu-form .form-status{margin:.8rem 0 0;padding:.7rem .9rem;background:#fff;border-radius:8px;color:#1c2733;font-size:.9rem;line-height:1.7}
+.mitsu-form__notes{list-style:none;margin:1rem 0 0;padding:0;display:grid;gap:.3rem;font-size:.84rem;line-height:1.6}
+.mitsu-form__notes li{position:relative;margin:0;padding-left:1.2em}
+.mitsu-form__notes li::before{content:"";position:absolute;left:.15em;top:.55em;width:.5em;height:.5em;border-radius:50%;background:#ffd66b}
+.mitsu-self{margin:1.1rem 0 0;text-align:center;font-size:.95rem;font-weight:700}
+.mitsu-self a{color:var(--m-navy);text-underline-offset:4px}
+.mitsu-self a::after{content:" →"}
+.mitsu-noscript{margin:1rem 0 0;padding:1rem;background:#fff;border-radius:10px;font-size:.92rem;line-height:1.8}
+@media (max-width:600px){
+  .mitsu-points{grid-template-columns:minmax(0,1fr);gap:.4rem}
+  .mitsu-points li{min-height:2.7rem}
+  .mitsu{margin-inline:calc(var(--gut) * -.5);padding:1rem .8rem 1.3rem;border-radius:14px}
+  .mitsu-opts{margin-left:0}
+  .mitsu-opts button{flex:1 1 calc(50% - .3rem);padding:.55rem .6rem}
+  .mitsu-q p{font-size:1rem;padding:.7rem .9rem}
+  .mitsu-form{padding:1.2rem .9rem 1rem}
+  .mitsu-form h2{font-size:1.15rem}
+}
+@media (prefers-reduced-motion:reduce){.mitsu-opts button{transition:none}}
