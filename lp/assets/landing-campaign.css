@@ -1,0 +1,33 @@
+/* This offer and floating banner belong to the advertising LP only. */
+body.ranking-landing--campaign { padding-bottom:calc(210px + env(safe-area-inset-bottom, 0px)); }
+html:has(body.ranking-landing--campaign) { scroll-padding-bottom:210px; }
+
+.ranking-landing .lp-campaign-contact { padding:28px 24px; background:#eaf5ff; border:1px solid #bcdcf4; border-radius:16px; text-align:center; }
+.ranking-landing .lp-campaign-contact .lp-campaign-contact__lead { margin:0; color:#0763ac; font-size:21px; font-weight:700; }
+.ranking-landing .lp-campaign-contact .lp-campaign-contact__discount { display:flex; justify-content:center; align-items:baseline; gap:4px; margin:4px 0 22px; color:#086ebc; font-family:Arial,sans-serif; line-height:1; }
+.lp-campaign-contact__discount b { font-size:84px; letter-spacing:-.06em; }
+.lp-campaign-contact__discount>span { font-size:40px; font-weight:700; }
+.lp-campaign-contact__discount>strong { margin-left:7px; font-size:44px; letter-spacing:-.025em; }
+.ranking-landing .lp-campaign-contact>small { display:block; margin-top:14px; font-size:16px; }
+.ranking-landing .lp-campaign-contact .lp-campaign-contact__terms { margin:10px 0 0; font-size:16px; font-weight:400; color:#526b79; line-height:1.6; }
+
+.lp-campaign-banner { position:fixed; z-index:60; inset:auto 12px calc(8px + env(safe-area-inset-bottom, 0px)); width:calc(100% - 24px); max-width:710px; margin-inline:auto; }
+.lp-campaign-banner__link { position:relative; display:block; aspect-ratio:3.8; border:0; border-radius:20px; background:none; text-decoration:none; transition:transform .18s ease; }
+/* The source has transparent top/bottom margins. This frame removes only that empty space. */
+.lp-campaign-banner__art { display:block; width:100%; height:100%; object-fit:cover; }
+.lp-campaign-banner__link::after { content:''; position:absolute; inset:20% 3% 10% 32%; border-radius:18px; pointer-events:none; background:linear-gradient(110deg,transparent 25%,#ffffff35 50%,transparent 75%) no-repeat; background-size:45% 100%; animation:lp-banner-shine 6s ease-in-out infinite; }
+@keyframes lp-banner-shine { 0%,65% { background-position:-120% 0; } 90%,100% { background-position:220% 0; } }
+.lp-campaign-banner__link:focus-visible { outline:3px solid #0873c5; outline-offset:3px; }
+.lp-campaign-banner__link:active { transform:translateY(3px); }
+@media(hover:hover) { .lp-campaign-banner__link:hover { transform:translateY(-2px); } }
+@media(max-width:720px) {
+  body.ranking-landing--campaign { padding-bottom:calc(27vw + 22px + env(safe-area-inset-bottom, 0px)); }
+  html:has(body.ranking-landing--campaign) { scroll-padding-bottom:calc(27vw + 22px); }
+  .ranking-landing .lp-campaign-contact { padding:24px 14px; }
+  .ranking-landing .lp-campaign-contact .lp-campaign-contact__lead { font-size:19px; }
+  .lp-campaign-contact__discount b { font-size:76px; }
+  :root body.ranking-page.ranking-landing .lp-campaign-contact .focus-button { padding:16px 38px 16px 16px; min-height:64px; font-size:clamp(16px,4.2vw,18px); line-height:1.5; }
+  .lp-campaign-banner { inset-inline:4px; bottom:calc(6px + env(safe-area-inset-bottom, 0px)); width:calc(100% - 8px); }
+  .lp-campaign-banner__link { border-radius:12px; }
+}
+@media(prefers-reduced-motion:reduce) { .lp-campaign-banner__link { transition:none; } .lp-campaign-banner__link::after { animation:none; background:none; } }
