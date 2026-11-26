@@ -459,14 +459,3 @@ body.ranking-page--select :is(.lp-guarantee-feature__document>span,.lp-guarantee
   .regional-art .regional-art__count { inset:62% 36% auto 1%; height:20.6%; font-size:6.3cqw; }
   .regional-art__count b { font-size:11cqw; }
 }
-body.ranking-landing.ranking-page--regional { padding-bottom:calc(96px + env(safe-area-inset-bottom,0px)); }
-html:has(body.ranking-landing.ranking-page--regional) { scroll-padding-bottom:96px; }
-.ranking-page--regional .regional-banner { width:min(calc(100% - 16px),660px); }
-.regional-banner__link { position:relative; display:flex; align-items:center; gap:clamp(6px,1.5vw,16px); min-height:64px; border:2px solid #aabaca; border-radius:16px; padding:3px clamp(8px,2vw,18px); color:white; background:linear-gradient(175deg,#147fe1,#0956b8 55%,#07449d); box-shadow:inset 0 1px 1px #c0e1ff,0 2px 0 #566a80,0 4px 10px #254c743b; text-decoration:none; }
-.regional-banner__link:visited,.regional-banner__link:hover { color:white; }
-.regional-banner__badge { background:#fffdf7; border:3px solid #c19a42; color:#aa2e20; border-radius:50%; width:clamp(56px,11vw,76px); aspect-ratio:1; margin-block:-6px; box-shadow:0 2px 5px #12365848; display:grid; align-content:center; justify-items:center; flex:none; font-weight:700; font-size:clamp(15px,3vw,19px); line-height:1.1; }
-.regional-banner__badge img { object-fit:contain; }
-.regional-banner__text { display:grid; justify-items:center; gap:2px; flex:1; text-align:center; line-height:1.35; }
-.regional-banner__text small { background:#104494; color:#fff; border-radius:5px; padding:1px 9px; font-size:14px; }
-.regional-banner__text strong { font-size:clamp(16px,4.3vw,21px); }
-.regional-banner__arrow { font-size:26px; line-height:1; }
