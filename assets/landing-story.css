@@ -182,7 +182,8 @@ body.ranking-landing :is(.lp-intro,.lp-care,.lp-questions,.lp-story-closing)::af
 body.ranking-landing .lp-story.lp-intro {
   padding-bottom:calc(30px + var(--story-curve));
 }
-body.ranking-landing :is(.lp-care,.lp-questions) {
+body.ranking-landing .lp-care,
+body.ranking-landing #s-faq.lp-questions {
   padding-block:calc(48px + var(--story-curve));
   border-radius:50% 50% 0 0 / var(--story-curve) var(--story-curve) 0 0;
 }
@@ -268,7 +269,8 @@ body.ranking-landing .lp-story-closing {
   .lp-faq-answer { font-size:16px; }
   .lp-faq-more { padding:0 20px 20px 48px; font-size:16px; }
   body.ranking-landing .lp-story-closing p { font-size:17px; }
-  body.ranking-landing :is(.lp-care,.lp-questions,.lp-story-closing) { padding-block:calc(28px + var(--story-curve)); }
+  body.ranking-landing :is(.lp-care,.lp-story-closing),
+  body.ranking-landing #s-faq.lp-questions { padding-block:calc(28px + var(--story-curve)); }
   body.ranking-landing .lp-story-closing { margin-top:20px; }
 }
 
