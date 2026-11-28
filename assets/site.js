@@ -245,3 +245,60 @@
     });
   }
 })();
+
+// Microsoft Clarity: compare the visibility and use of ranking links on the public site.
+(function () {
+  'use strict';
+  if (!/^(www\.)?hajimete-tokusyuseisou\.com$/.test(window.location.hostname)) return;
+  if (/^\/(contact|mitsumori)(\/|$)/.test(window.location.pathname) || document.querySelector('[data-contact-form]')) return;
+  if (navigator.globalPrivacyControl || navigator.doNotTrack === '1' || window.clarity) return;
+
+  var clarity = window.clarity = function () {
+    (clarity.q = clarity.q || []).push(arguments);
+  };
+  var tag = document.createElement('script');
+  tag.async = true;
+  tag.src = 'https://www.clarity.ms/tag/zkhe1jid7n';
+  document.head.appendChild(tag);
+
+  var table = document.querySelector('#s-compare .select-compare__table');
+  var isLanding = /^\/lp\//.test(window.location.pathname);
+  clarity('set', 'page_type', isLanding ? 'ad_lp' : table ? 'ranking' : 'other');
+  if (!table && !isLanding) return;
+
+  var links = Array.from(document.querySelectorAll('a[data-company="clean-estate"][data-cta]')).filter(function (link) {
+    return link.hostname === 'clean-estate.co.jp' || link.hostname === 'www.clean-estate.co.jp';
+  });
+  function recordClick(event) {
+    if (event.type === 'auxclick' && event.button !== 1) return;
+    clarity('event', 'rank1_outbound');
+    clarity('event', 'rank1_outbound_' + event.currentTarget.dataset.cta);
+  }
+  links.forEach(function (link) {
+    link.addEventListener('click', recordClick);
+    link.addEventListener('auxclick', recordClick);
+  });
+
+  if (!('IntersectionObserver' in window)) return;
+  var seen = new Set();
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting || entry.intersectionRatio <= 0) return;
+      var node = entry.target;
+      if (node === table) {
+        clarity('event', 'comparison_view');
+      } else {
+        if (entry.intersectionRatio < 0.5) return;
+        var placement = node.dataset.cta;
+        if (!seen.has(placement)) {
+          if (!seen.size) clarity('event', 'rank1_cta_view');
+          clarity('event', 'rank1_cta_view_' + placement);
+          seen.add(placement);
+        }
+      }
+      observer.unobserve(node);
+    });
+  }, { threshold: [0, 0.001, 0.5] });
+  if (table) observer.observe(table);
+  links.forEach(function (link) { observer.observe(link); });
+})();
